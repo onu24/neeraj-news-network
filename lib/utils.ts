@@ -18,12 +18,12 @@ export function slugify(text: string): string {
     .toString()
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, '')     // Remove non-word (except space/dash)
-    .replace(/[\s_]+/g, '-')       // Replace spaces and underscores with -
-    .replace(/-+/g, '-')           // Replace multiple - with single -
-    .replace(/^-+/, '')            // Trim - from start
-    .replace(/-+$/, '');           // Trim - from end
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')  // Preserves Unicode letters (Hindi) and numbers
+    .replace(/[\s_]+/g, '-')            // Replace spaces and underscores with -
+    .replace(/-+/g, '-')                // Replace multiple - with single -
+    .replace(/^-+/, '')                 // Trim - from start
+    .replace(/-+$/, '');                // Trim - from end
 }
 
-export const FALLBACK_IMAGE = '/images/placeholders/news-placeholder.jpg';
+export const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=1200&auto=format&fit=crop';
 export const FALLBACK_AVATAR = '/placeholder-user.jpg';

@@ -21,8 +21,10 @@ export function HeroLatestSection({ leadArticle, latestArticles }: HeroLatestSec
      }
   };
 
-  const leadTitle = (language === 'hi' && leadArticle.title_hi) ? leadArticle.title_hi : leadArticle.title;
-  const leadExcerpt = (language === 'hi' && leadArticle.excerpt_hi) ? leadArticle.excerpt_hi : (leadArticle.excerpt || (language === 'hi' ? 'आज की महत्वपूर्ण खबर का संपादन विश्लेषण। दृश्यम न्यूज़ पर विस्तृत कवरेज।' : "Editorial analysis of today's developing story. Comprehensive coverage on Drishyam News."));
+  const leadTitle = (language === 'hi' && leadArticle.title_hi && leadArticle.title_hi.trim() !== '') ? leadArticle.title_hi : leadArticle.title;
+  const leadExcerpt = (language === 'hi' && leadArticle.excerpt_hi && leadArticle.excerpt_hi.trim() !== '') 
+    ? leadArticle.excerpt_hi 
+    : (leadArticle.excerpt || leadArticle.excerpt_hi || (language === 'hi' ? 'आज की महत्वपूर्ण खबर का संपादन विश्लेषण। दृश्यम न्यूज़ पर विस्तृत कवरेज।' : "Editorial analysis of today's developing story. Comprehensive coverage on Drishyam News."));
 
   return (
     <section className="bg-white border-b-4 border-black/5 py-8 sm:py-12">

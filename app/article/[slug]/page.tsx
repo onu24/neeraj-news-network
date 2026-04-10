@@ -6,6 +6,8 @@ import { ArticleContent } from '@/components/article/ArticleContent';
 import { ArticleSidebar } from '@/components/article/ArticleSidebar';
 import { ShareButtons } from '@/components/article/ShareButtons';
 import { ArticleImageGallery } from '@/components/article/ArticleImageGallery';
+import { ReadingProgress } from '@/components/article/ReadingProgress';
+import { TableOfContents } from '@/components/article/TableOfContents';
 import { 
   getArticleBySlug, 
   getAuthorById, 
@@ -17,6 +19,7 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import Script from 'next/script';
 
 export const revalidate = 60;
 
@@ -36,8 +39,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!article) return { title: 'Article Not Found' };
   
   // Hindi-first metadata for SEO
-  const title = article.title_hi || article.title;
-  const description = article.excerpt_hi || article.excerpt;
+  const title = (article.title_hi && article.title_hi.trim() !== '') ? article.title_hi : article.title;
+  const description = (article.excerpt_hi && article.excerpt_hi.trim() !== '') ? article.excerpt_hi : (article.excerpt || article.excerpt_hi);
   
   const galleryImages = Array.isArray(article.galleryImages) ? article.galleryImages.filter(Boolean) : [];
   const ogImages = Array.from(new Set([article.coverImage, ...galleryImages].filter(Boolean)));
@@ -49,6 +52,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: title,
       description: description,
       images: ogImages,
+    },
+    alternates: {
+      canonical: `https://drishyam-news.com/article/${slug}`,
     },
   };
 }
@@ -80,8 +86,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const schemaImages = Array.from(new Set([article.coverImage, ...galleryImages].filter(Boolean)));
 
   // Hindi-first selection for structured data
-  const displayTitle = article.title_hi || article.title;
-  const displayExcerpt = article.excerpt_hi || article.excerpt;
+  const displayTitle = (article.title_hi && article.title_hi.trim() !== '') ? article.title_hi : article.title;
+  const displayExcerpt = (article.excerpt_hi && article.excerpt_hi.trim() !== '') ? article.excerpt_hi : (article.excerpt || article.excerpt_hi);
 
   // JSON-LD Structured Data
   const jsonLd = {
@@ -117,74 +123,76 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   return (
     <main className="flex flex-col min-h-screen bg-white">
+      <ReadingProgress />
       {/* Structured Data for SEO */}
-      <script
+      <Script
         id="article-json-ld"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        strategy="afterInteractive"
       />
       
       <Header />
       <Navbar />
 
       <div className="flex-1 bg-white">
-        <ArticleHeader article={article} author={author || undefined} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          
+          {/* Breadcrumbs - Moved here for better column alignment */}
+          <div className="flex items-center gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-muted-foreground mb-8">
+            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+            <span className="opacity-30">/</span>
+            <Link href={`/category/${article.categorySlug || 'news'}`} className="hover:text-primary transition-colors">
+              {article.category || 'News'}
+            </Link>
+          </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-16">
+            
+            {/* Left Column (~70% / 8 grid cols) */}
+            <div className="lg:col-span-8 flex flex-col">
+              <ArticleHeader article={article} author={author || undefined} />
 
-            {/* Main Content Column */}
-            <div className="lg:col-span-8">
-              <ArticleContent
-                content={article.content}
-                content_hi={article.content_hi}
-                keyPoints={article.keyPoints}
-                articleType={article.articleType}
-                contentFont={article.contentFont}
-              />
+              <div className="mt-12">
+                <TableOfContents content={article.content_hi || article.content} />
+                
+                <ArticleContent
+                  content={article.content}
+                  content_hi={article.content_hi}
+                  keyPoints={article.keyPoints}
+                  articleType={article.articleType}
+                  contentFont={article.contentFont}
+                />
+              </div>
 
               {galleryImages.length > 0 && (
-                <ArticleImageGallery images={galleryImages} title={displayTitle} />
+                <div className="mt-12">
+                  <ArticleImageGallery images={galleryImages} title={displayTitle} />
+                </div>
               )}
 
-              <ShareButtons title={displayTitle} url={`/article/${slug}`} />
-
-              {/* Author Bio */}
-              {author && (
-                <div className="bg-secondary/20 p-8 rounded-sm my-12 flex flex-col sm:flex-row gap-6 items-center sm:items-start text-center sm:text-left border border-border/50">
-                  <div className="relative w-20 h-20 shrink-0 rounded-full overflow-hidden bg-muted">
-                    {(author.avatar) && (
-                      <Image
-                        src={author.avatar || ''}
-                        alt={author.name}
-                        fill
-                        className="object-cover"
-                      />
-                    )}
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-bold font-serif mb-2">{author.name}</h4>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                      {author.bio || 'Author bio coming soon.'}
-                    </p>
-                    <Link
-                      href={`/author/${author.id}`}
-                      className="text-primary font-bold text-xs uppercase tracking-widest hover:underline"
-                    >
-                      More from this author →
-                    </Link>
-                  </div>
+              {/* Tags Section */}
+              {article.tags && article.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-12 py-8 border-t border-zinc-100">
+                  {article.tags.map(tag => (
+                    <span key={tag} className="px-3 py-1 bg-zinc-100 text-[10px] font-black uppercase tracking-widest text-zinc-500 rounded-sm">
+                      #{tag}
+                    </span>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Sidebar */}
-            <div className="lg:col-span-4 mt-8 lg:mt-0">
+            {/* Right Sidebar (~30% / 4 grid cols) */}
+            <div className="lg:col-span-4 mt-12 lg:mt-0">
               <ArticleSidebar
                 relatedArticles={filteredRelated}
                 trendingArticles={trendingArticles}
+                articleTitle={displayTitle}
+                articleUrl={`/article/${slug}`}
               />
             </div>
+
           </div>
         </div>
       </div>

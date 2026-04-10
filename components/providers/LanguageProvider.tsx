@@ -60,8 +60,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 export function useLanguage() {
   const context = useContext(LanguageContext);
   if (context === undefined) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn('[LanguageProvider] useLanguage called outside provider. Falling back to Hindi defaults.');
+    // Silence warning on server or in production
+    if (process.env.NODE_ENV !== 'production' && typeof window !== 'undefined') {
+       console.warn('[LanguageProvider] useLanguage called outside provider. Falling back to Hindi defaults.');
     }
     return FALLBACK_LANGUAGE_CONTEXT;
   }

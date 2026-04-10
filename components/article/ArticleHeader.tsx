@@ -50,21 +50,32 @@ export function ArticleHeader({ article, author }: ArticleHeaderProps) {
   const displayCategory = language === 'hi' ? (article.category || 'न्यूज़') : (article.category || 'NEWS');
   
   // Choose localized content with English fallback
-  const displayTitle = (language === 'hi' && article.title_hi) ? article.title_hi : article.title;
-  const displayExcerpt = (language === 'hi' && article.excerpt_hi) ? article.excerpt_hi : article.excerpt;
+  const displayTitle = (language === 'hi' && article.title_hi && article.title_hi.trim() !== '') ? article.title_hi : article.title;
+  const displayExcerpt = (language === 'hi' && article.excerpt_hi && article.excerpt_hi.trim() !== '') ? article.excerpt_hi : (article.excerpt || article.excerpt_hi);
 
   return (
-    <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6">
-      {/* Breadcrumbs */}
-      <ScrollReveal delay={100}>
-        <div className="flex items-center gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-muted-foreground mb-10">
-          <Link href="/" className="hover:text-primary transition-colors">{t('home')}</Link>
-          <span className="opacity-30">/</span>
-          <Link href={`/category/${article.categorySlug || 'news'}`} className="hover:text-primary transition-colors">
-            {displayCategory}
-          </Link>
-        </div>
-      </ScrollReveal>
+    <div className="w-full">
+      {/* Hero Featured Image - NOW AT TOP */}
+      {article.coverImage && (
+        <ScrollReveal delay={100} baseClass="reveal-blur">
+          <div className="mb-10 group">
+            <div className="relative w-full aspect-video overflow-hidden rounded-sm shadow-2xl border border-zinc-200">
+              <Image
+                src={article.coverImage}
+                alt={article.title}
+                fill
+                sizes="(max-width: 1024px) 100vw, 1000px"
+                className="object-cover group-hover:scale-[1.01] transition-transform duration-1000"
+                priority
+                loading="eager"
+              />
+              <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-white text-[9px] font-bold px-3 py-1.5 uppercase tracking-widest rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                 Media Archive / Drishyam News Network
+              </div>
+            </div>
+          </div>
+        </ScrollReveal>
+      )}
 
       <ScrollReveal delay={200}>
         <div className="space-y-8">
@@ -157,26 +168,6 @@ export function ArticleHeader({ article, author }: ArticleHeaderProps) {
       </div>
       </ScrollReveal>
 
-      {/* Hero Featured Image */}
-      {article.coverImage && (
-        <ScrollReveal delay={400} baseClass="reveal-blur">
-          <div className="mt-12 mb-6 group">
-            <div className="relative w-full aspect-video overflow-hidden rounded-sm shadow-2xl border border-zinc-200">
-              <Image
-                src={article.coverImage}
-                alt={article.title}
-                fill
-                className="object-cover group-hover:scale-[1.01] transition-transform duration-1000"
-                priority
-              />
-              {/* Minimal Photo Caption Overlay */}
-              <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-white text-[9px] font-bold px-3 py-1.5 uppercase tracking-widest rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                 Media Archive / Drishyam News Network
-              </div>
-            </div>
-          </div>
-        </ScrollReveal>
-      )}
-    </article>
+    </div>
   );
 }

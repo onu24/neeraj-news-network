@@ -81,6 +81,8 @@ export const TRANSLATIONS = {
     published_on: 'Published on',
     media_archive: 'Media Archive / Drishyam News Network',
     share_story: 'Share this story',
+    social_share: 'Share Story',
+    table_of_contents: 'Contents',
     back_home: 'Back to Home',
     view_all: 'View All',
   },
@@ -164,6 +166,8 @@ export const TRANSLATIONS = {
     published_on: 'प्रकाशित',
     media_archive: 'मीडिया आर्काइव / दृश्यम न्यूज नेटवर्क',
     share_story: 'इस खबर को शेयर करें',
+    social_share: 'खबर शेयर करें',
+    table_of_contents: 'लेख सूची',
     back_home: 'होम पर वापस जाएं',
     view_all: 'सभी देखें',
   }

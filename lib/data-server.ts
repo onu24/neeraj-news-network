@@ -1,7 +1,7 @@
 import 'server-only';
 import { db } from './firebase';
 import { adminDb, isFirebaseAdminConfigured } from './firebase-admin';
-import { query, collection, orderBy, limit, getDocs, where } from 'firebase/firestore';
+import { query, collection, orderBy, limit, getDocs, where, doc, getDoc } from 'firebase/firestore';
 import { NewsArticle, VisualStory, Author, Category, AboutPageContent } from './types';
 import { toArticle } from './data';
 
@@ -125,27 +125,38 @@ export async function getTrendingArticles(count = 5): Promise<NewsArticle[]> {
  */
 export const getArticleMetadataBySlug = cache(async (slug: string): Promise<NewsArticle | null> => {
   try {
+    // 1. Try Admin SDK by Slug
     if (isFirebaseAdminConfigured()) {
-      const dbAdmin = adminDb();
-      if (dbAdmin) {
-        const snap = await dbAdmin.collection('articles')
-          .where('slug', '==', slug)
-          .limit(1)
-          .select(...METADATA_FIELDS)
-          .get();
-        if (!snap.empty) {
-          const doc = snap.docs[0];
-          return toArticle(doc.id, doc.data());
+      try {
+        const dbAdmin = adminDb();
+        if (dbAdmin) {
+          const snap = await dbAdmin.collection('articles')
+            .where('slug', '==', slug)
+            .limit(1)
+            .select(...METADATA_FIELDS)
+            .get();
+          if (!snap.empty) {
+            const doc = snap.docs[0];
+            return toArticle(doc.id, doc.data());
+          }
         }
+      } catch (adminErr) {
+        console.warn(`[data-server] getArticleMetadataBySlug Admin fallback:`, adminErr);
       }
     }
-    // Fallback to client SDK if admin not configured
+
+    // 2. Try Client SDK by Slug
     const q = query(collection(db, 'articles'), where('slug', '==', slug), limit(1));
     const snap = await getDocs(q);
     if (!snap.empty) return toArticle(snap.docs[0].id, snap.docs[0].data());
+
+    // 3. Last Resort: Try direct doc ID lookup (for cases where slug field is missing)
+    const docRef = doc(db, 'articles', slug);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) return toArticle(docSnap.id, docSnap.data());
+
   } catch (e) {
     console.error(`[data-server] getArticleMetadataBySlug error:`, e);
-  } finally {
   }
   return null;
 });
@@ -156,25 +167,47 @@ export const getArticleMetadataBySlug = cache(async (slug: string): Promise<News
  */
 export const getArticleBySlug = cache(async (slug: string): Promise<NewsArticle | null> => {
   try {
+    // Ensure slug is decoded (handles Hindi characters in URL)
+    const decodedSlug = decodeURIComponent(slug);
+
+    // 1. Try Admin SDK by Slug
     if (isFirebaseAdminConfigured()) {
-      const dbAdmin = adminDb();
-      if (dbAdmin) {
-        const snap = await dbAdmin.collection('articles')
-          .where('slug', '==', slug)
-          .limit(1)
-          .get();
-        if (!snap.empty) {
-          const doc = snap.docs[0];
-          return toArticle(doc.id, doc.data());
+      try {
+        const dbAdmin = adminDb();
+        if (dbAdmin) {
+          const snap = await dbAdmin.collection('articles')
+            .where('slug', '==', decodedSlug)
+            .limit(1)
+            .get();
+          if (!snap.empty) {
+            const doc = snap.docs[0];
+            return toArticle(doc.id, doc.data());
+          }
         }
+      } catch (adminErr) {
+        console.warn(`[data-server] getArticleBySlug Admin fallback:`, adminErr);
       }
     }
-    const q = query(collection(db, 'articles'), where('slug', '==', slug), limit(1));
+
+    // 2. Try Client SDK by Slug
+    const q = query(collection(db, 'articles'), where('slug', '==', decodedSlug), limit(1));
     const snap = await getDocs(q);
     if (!snap.empty) return toArticle(snap.docs[0].id, snap.docs[0].data());
+
+    // 3. Last Resort: Try direct doc ID lookup (using the original slug parameter which might be the ID)
+    const docRef = doc(db, 'articles', slug);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) return toArticle(docSnap.id, docSnap.data());
+
+    // 4. Try direct doc ID lookup with decoded slug just in case
+    if (decodedSlug !== slug) {
+      const decodedRef = doc(db, 'articles', decodedSlug);
+      const decodedSnap = await getDoc(decodedRef);
+      if (decodedSnap.exists()) return toArticle(decodedSnap.id, decodedSnap.data());
+    }
+
   } catch (e) {
     console.error(`[data-server] getArticleBySlug error:`, e);
-  } finally {
   }
   return null;
 });

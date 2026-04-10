@@ -28,6 +28,7 @@ export function OpinionRow({ articles }: OpinionRowProps) {
                       src={opinion.coverImage}
                       alt={opinion.authorId || 'Author'}
                       fill
+                      sizes="48px"
                       className="object-cover"
                     />
                   ) : (

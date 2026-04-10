@@ -56,6 +56,7 @@ export function VisualStories() {
                   src={story.coverImage} 
                   alt={story.title}
                   fill
+                  sizes="160px"
                   className="object-cover"
                 />
               </div>

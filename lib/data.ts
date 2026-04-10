@@ -9,16 +9,7 @@
  * without needing manual index configuration in the Firebase Console.
  */
 
-import {
-  collection,
-  doc,
-  getDoc,
-  query,
-  where,
-  orderBy,
-  limit,
-  getDocs,
-} from 'firebase/firestore';
+import { getFirestore, Firestore, initializeFirestore, doc, getDoc, query, collection, orderBy, limit, getDocs, where } from 'firebase/firestore';
 import { db } from './firebase';
 import { NewsArticle, VisualStory, Author, Category, AboutPageContent } from './types';
 import { slugify, FALLBACK_IMAGE } from './utils';
@@ -44,23 +35,33 @@ export function toArticle(id: string, data: Record<string, any>): NewsArticle {
     : [];
   const fallback = CATEGORY_FALLBACK_MAP[categorySlug];
   
+  // Global Image URL Sanitization
+  const rawCover = data.coverImage || data.imageUrl || FALLBACK_IMAGE;
+  const isDirectImage = rawCover && (!rawCover.includes('ibb.co/') || /\.(jpg|jpeg|png|webp|avif|gif)$/i.test(rawCover));
+  const safeCoverImage = isDirectImage ? rawCover : FALLBACK_IMAGE;
+
+  // Slugs: Use DB slug if present, otherwise use document ID.
+  // We avoid generating a virtual slug from the title here because 
+  // the database query would fail to find it if it's not actually stored.
+  const safeSlug = (data.slug && data.slug.trim() !== '') ? data.slug : id;
+
   return {
     id,
     title,
-    title_hi: data.title_hi || '',
-    slug: data.slug || slugify(title),
+    title_hi: data.title_hi || null,
+    slug: safeSlug,
     excerpt: data.excerpt || '',
-    excerpt_hi: data.excerpt_hi || '',
+    excerpt_hi: data.excerpt_hi || null,
     content: data.content || '',
-    content_hi: data.content_hi || '',
+    content_hi: data.content_hi || null,
     contentFont,
     category: data.category_en || fallback?.en || category,
     category_hi: data.category_hi || fallback?.hi || category,
     categoryId: data.categoryId || '',
     categorySlug,
-    coverImage: data.coverImage || FALLBACK_IMAGE,
+    coverImage: safeCoverImage,
     galleryImages,
-    imageUrl: data.coverImage || FALLBACK_IMAGE, 
+    imageUrl: safeCoverImage, 
     authorId: data.authorId || 'drishyam-editorial',
     status: data.status || 'published',
     featured: !!data.featured,
@@ -219,10 +220,39 @@ export const getArticleBySlug = cache(async (slug: string): Promise<NewsArticle 
       console.timeEnd(timerLabel);
       return null;
     }
-    const q = query(collection(db, 'articles'), where('slug', '==', slug), limit(1));
+
+    // Ensure slug is decoded (handles Hindi characters in URL)
+    const decodedSlug = decodeURIComponent(slug);
+
+    // 1. Try Slug Query
+    const q = query(collection(db, 'articles'), where('slug', '==', decodedSlug), limit(1));
     const snap = await getDocs(q);
+    
+    if (!snap.empty) {
+      console.timeEnd(timerLabel);
+      return toArticle(snap.docs[0].id, snap.docs[0].data());
+    }
+
+    // 2. Fallback: Try direct doc ID lookup
+    const docRef = doc(db, 'articles', slug);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      console.timeEnd(timerLabel);
+      return toArticle(docSnap.id, docSnap.data());
+    }
+
+    // 3. Fallback: Try direct doc ID lookup with decoded slug
+    if (decodedSlug !== slug) {
+      const decodedRef = doc(db, 'articles', decodedSlug);
+      const decodedSnap = await getDoc(decodedRef);
+      if (decodedSnap.exists()) {
+        console.timeEnd(timerLabel);
+        return toArticle(decodedSnap.id, decodedSnap.data());
+      }
+    }
+
     console.timeEnd(timerLabel);
-    if (!snap.empty) return toArticle(snap.docs[0].id, snap.docs[0].data());
   } catch (e) {
     console.error(`[data] getArticleBySlug(${slug}) error:`, e);
     console.timeEnd(timerLabel);

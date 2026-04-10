@@ -25,8 +25,8 @@ const FONT_CLASS_MAP: Record<ArticleContentFont, string> = {
 export function ArticleContent({ content, content_hi, keyPoints, articleType, contentFont = 'serif' }: ArticleContentProps) {
   const { language, t } = useLanguage();
   
-  // Choose correct content based on language
-  const displayContent = (language === 'hi' && content_hi) ? content_hi : content;
+  // Choose correct content based on language with fallback
+  const displayContent = (language === 'hi' && content_hi && content_hi.trim() !== '') ? content_hi : (content || content_hi);
   
   if (!displayContent && (!keyPoints || keyPoints.length === 0)) return null;
 
@@ -35,12 +35,12 @@ export function ArticleContent({ content, content_hi, keyPoints, articleType, co
   const fontClass = language === 'hi' ? 'font-hindi' : (FONT_CLASS_MAP[contentFont] || FONT_CLASS_MAP.serif);
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:text-foreground prose-p:text-foreground/90 prose-p:leading-relaxed prose-p:mb-6 prose-a:text-primary prose-strong:text-foreground">
+    <div className="max-w-[700px] mx-auto">
+      <div className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:text-foreground prose-p:text-foreground/90 prose-p:leading-[1.7] prose-p:mb-8 prose-a:text-primary prose-strong:text-foreground">
         
         {/* Key Points for Explainers */}
         {articleType === 'explainer' && keyPoints && keyPoints.length > 0 && (
-          <div className="bg-blue-50 border-l-4 border-blue-600 p-6 my-10 rounded-r-md">
+          <div className="bg-blue-50 border-l-4 border-blue-600 p-8 my-10 rounded-r-md">
             <h3 className="text-blue-900 font-bold text-xl mb-4 flex items-center gap-2 m-0 font-sans">
               <CheckCircle2 className="h-5 w-5" />
               {t('key_highlights')}
@@ -63,10 +63,17 @@ export function ArticleContent({ content, content_hi, keyPoints, articleType, co
             if (levelMatch) {
                 const level = levelMatch[0].length;
                 const text = paragraph.replace(/^#+\s/, '');
-                const HeadingTag = `h${Math.min(level + 2, 6)}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+                const HeadingTag = `h${Math.min(level + 1, 6)}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+                
+                // Create ID for TOC matching the TOC component's logic
+                const id = text.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-');
                 
                 return (
-                  <HeadingTag key={index} className={`mt-12 mb-6 ${fontClass} font-bold text-foreground tracking-tight`}>
+                  <HeadingTag 
+                    key={index} 
+                    id={id}
+                    className={`mt-14 mb-6 ${fontClass} font-bold text-foreground tracking-tight scroll-mt-24`}
+                  >
                     {text}
                   </HeadingTag>
                 );
@@ -77,7 +84,7 @@ export function ArticleContent({ content, content_hi, keyPoints, articleType, co
           if (paragraph.startsWith('>')) {
             const text = paragraph.replace(/^>\s/, '');
             return (
-              <blockquote key={index} className={`border-l-4 border-primary pl-6 py-2 my-10 italic text-2xl ${fontClass} text-muted-foreground leading-relaxed`}>
+              <blockquote key={index} className={`border-l-4 border-primary pl-8 py-2 my-12 italic text-2xl sm:text-3xl ${fontClass} text-muted-foreground leading-relaxed font-serif`}>
                 {text}
               </blockquote>
             );
@@ -85,7 +92,7 @@ export function ArticleContent({ content, content_hi, keyPoints, articleType, co
 
           // Regular paragraph
           return (
-            <p key={index} className={`text-xl leading-relaxed text-foreground/90 mb-8 ${fontClass} selection:bg-primary/20`}>
+            <p key={index} className={`text-xl leading-[1.7] text-foreground/90 mb-8 ${fontClass} selection:bg-primary/20`}>
               {paragraph}
             </p>
           );

@@ -27,9 +27,11 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
     }
   };
 
-  const displayTitle = (language === 'hi' && article.title_hi) ? article.title_hi : article.title;
-  const displayDescription = (language === 'hi' && article.excerpt_hi) ? article.excerpt_hi : article.excerpt;
+  const displayTitle = (language === 'hi' && article.title_hi && article.title_hi.trim() !== '') ? article.title_hi : article.title;
+  const displayDescription = (language === 'hi' && article.excerpt_hi && article.excerpt_hi.trim() !== '') ? article.excerpt_hi : (article.excerpt || article.excerpt_hi);
+  
   const imageUrl = article.coverImage;
+
   const displayCategory = language === 'hi' ? (article.category_hi || 'न्यूज़') : (article.category || 'NEWS');
 
   if (variant === 'featured') {
@@ -41,6 +43,7 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
               src={imageUrl}
               alt={displayTitle}
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
               priority
             />
@@ -83,6 +86,7 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
               src={imageUrl}
               alt={displayTitle}
               fill
+              sizes="(max-width: 768px) 100px, 128px"
               className="object-cover group-hover:scale-105 transition-transform duration-500"
             />
           )}
@@ -109,6 +113,7 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
               src={imageUrl}
               alt={displayTitle}
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
               className="object-cover group-hover:scale-105 transition-transform duration-500"
             />
           )}
@@ -132,6 +137,7 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
             src={imageUrl}
             alt={displayTitle}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         )}

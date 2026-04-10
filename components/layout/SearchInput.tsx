@@ -98,7 +98,7 @@ export function SearchInput() {
                   {language === 'hi' ? 'खबरों की सूची' : 'Articles List'}
                 </p>
                 {results.map((article) => {
-                  const displayTitle = (language === 'hi' && article.title_hi) ? article.title_hi : article.title;
+                  const displayTitle = (language === 'hi' && article.title_hi && article.title_hi.trim() !== '') ? article.title_hi : article.title;
                   return (
                     <Link
                       key={article.id}
