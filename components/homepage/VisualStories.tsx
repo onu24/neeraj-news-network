@@ -5,8 +5,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { VisualStory } from '@/lib/types';
 import { getVisualStories } from '@/lib/data';
+import { useLanguage } from '@/components/providers/LanguageProvider';
 
 export function VisualStories() {
+  const { language, t } = useLanguage();
   const [stories, setStories] = useState<VisualStory[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -26,8 +28,8 @@ export function VisualStories() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <h2 className="font-bold text-xl sm:text-2xl tracking-tight text-foreground flex items-center">
-              Visual Stories
+            <h2 className={`font-bold text-xl sm:text-2xl tracking-tight text-foreground flex items-center ${language === 'hi' ? 'font-hindi' : ''}`}>
+              {t('visual_stories')}
             </h2>
             <span className="ml-3 px-2 py-0.5 bg-secondary text-muted-foreground text-[10px] uppercase font-bold tracking-widest rounded-sm">
               Web Stories
@@ -37,7 +39,7 @@ export function VisualStories() {
             href="/visual-stories" 
             className="text-xs font-bold uppercase tracking-widest text-primary hover:underline transition-all"
           >
-            View All
+            {t('view_all')}
           </Link>
         </div>
 
@@ -69,10 +71,10 @@ export function VisualStories() {
               </div>
               
               <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
-                <span className="text-[8px] uppercase tracking-wider text-white/70 font-bold mb-1 block">
-                  {story.category}
+                <span className={`text-[8px] uppercase tracking-wider text-white/70 font-bold mb-1 block ${language === 'hi' ? 'font-hindi' : ''}`}>
+                  {language === 'hi' ? 'दृश्यम' : (story.category || 'General')}
                 </span>
-                <h3 className="text-white text-xs sm:text-sm font-bold leading-tight font-serif drop-shadow-md">
+                <h3 className={`text-white text-xs sm:text-sm font-bold leading-tight font-serif drop-shadow-md ${language === 'hi' ? 'font-hindi' : ''}`}>
                   {story.title}
                 </h3>
               </div>

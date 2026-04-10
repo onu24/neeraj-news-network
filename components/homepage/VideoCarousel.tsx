@@ -1,28 +1,33 @@
+'use client';
+
 import { PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { NewsArticle } from '@/lib/types';
+import { useLanguage } from '@/components/providers/LanguageProvider';
 
 interface VideoCarouselProps {
   articles: NewsArticle[];
 }
 
 export function VideoCarousel({ articles }: VideoCarouselProps) {
+  const { language, t } = useLanguage();
+  
   if (articles.length === 0) return null;
 
   return (
     <section className="bg-black text-white py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-6 pb-2 border-b-2 border-white/20 relative">
-          <h2 className="font-bold text-2xl tracking-tight flex items-center">
+          <h2 className={`font-bold text-2xl tracking-tight flex items-center ${language === 'hi' ? 'font-hindi' : ''}`}>
             <PlayCircle className="mr-2 h-6 w-6 text-primary" />
-            Videos
+            {t('videos')}
           </h2>
           <Link
             href="/category/videos"
             className="text-xs font-bold text-primary hover:text-white uppercase tracking-widest transition-colors"
           >
-            All Videos →
+            {language === 'hi' ? 'सभी वीडियो →' : 'All Videos →'}
           </Link>
           <div className="absolute -bottom-[2px] left-0 w-12 border-b-2 border-primary" />
         </div>
@@ -55,16 +60,16 @@ export function VideoCarousel({ articles }: VideoCarouselProps) {
 
                 {/* Duration badge — use readingTime as proxy if no videoUrl */}
                 <div className="absolute bottom-2 right-2 bg-black/80 font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-sm z-30 shadow-sm">
-                  {video.readingTime ? `${video.readingTime} min` : 'Video'}
+                  {video.readingTime ? `${video.readingTime} ${language === 'hi' ? 'मिनट' : 'min'}` : (language === 'hi' ? 'वीडियो' : 'Video')}
                 </div>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[11px] font-bold text-primary uppercase tracking-widest">
-                  {video.category || video.tags?.[0] || 'Video'}
+                <span className={`text-[11px] font-bold text-primary uppercase tracking-widest ${language === 'hi' ? 'font-hindi' : ''}`}>
+                  {language === 'hi' ? (video.category_hi || 'वीडियो') : (video.category || 'Video')}
                 </span>
-                <h3 className="font-serif text-lg font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
-                  {video.title}
+                <h3 className={`font-serif text-lg font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2 ${language === 'hi' ? 'font-hindi' : ''}`}>
+                  {language === 'hi' ? (video.title_hi || video.title) : video.title}
                 </h3>
               </div>
             </Link>

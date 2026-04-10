@@ -13,7 +13,7 @@ interface AuthorManagerProps {
   authorCounts: Record<string, number>;
 }
 
-const DEFAULT_AVATAR = '/images/placeholders/avatar-placeholder.jpg';
+const DEFAULT_AVATAR = '/placeholder-user.jpg';
 
 export function AuthorManager({ initialAuthors, authorCounts }: AuthorManagerProps) {
   const [authors, setAuthors] = useState(initialAuthors);

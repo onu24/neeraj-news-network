@@ -23,13 +23,14 @@ import { db } from './firebase';
 import { NewsArticle, VisualStory, Author, Category, AboutPageContent } from './types';
 import { slugify, FALLBACK_IMAGE } from './utils';
 import { cache } from 'react';
+import { CATEGORY_FALLBACK_MAP } from './i18n';
 
 // --------------------------------------------------------------------------
 // Helpers
 // --------------------------------------------------------------------------
 
 /** Normalise a Firestore document into NewsArticle shape */
-function toArticle(id: string, data: Record<string, any>): NewsArticle {
+export function toArticle(id: string, data: Record<string, any>): NewsArticle {
   const title = data.title || 'Untitled Story';
   const category = data.category || 'News';
   const categorySlug = data.categorySlug || slugify(category);
@@ -41,15 +42,20 @@ function toArticle(id: string, data: Record<string, any>): NewsArticle {
   const galleryImages = Array.isArray(data.galleryImages)
     ? data.galleryImages.map((img: any) => String(img)).filter(Boolean)
     : [];
+  const fallback = CATEGORY_FALLBACK_MAP[categorySlug];
   
   return {
     id,
     title,
+    title_hi: data.title_hi || '',
     slug: data.slug || slugify(title),
     excerpt: data.excerpt || '',
+    excerpt_hi: data.excerpt_hi || '',
     content: data.content || '',
+    content_hi: data.content_hi || '',
     contentFont,
-    category,
+    category: data.category_en || fallback?.en || category,
+    category_hi: data.category_hi || fallback?.hi || category,
     categoryId: data.categoryId || '',
     categorySlug,
     coverImage: data.coverImage || FALLBACK_IMAGE,
@@ -65,8 +71,14 @@ function toArticle(id: string, data: Record<string, any>): NewsArticle {
     language: data.language || 'en',
     
     // Robust date handling
-    createdAt: data.createdAt?.toDate?.()?.toISOString?.() ?? data.createdAt ?? new Date().toISOString(),
-    updatedAt: data.updatedAt?.toDate?.()?.toISOString?.() ?? data.updatedAt ?? new Date().toISOString(),
+    createdAt: (() => {
+      const d = data.createdAt?.toDate?.() ?? new Date(data.createdAt);
+      return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+    })(),
+    updatedAt: (() => {
+      const d = data.updatedAt?.toDate?.() ?? new Date(data.updatedAt || data.createdAt);
+      return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+    })(),
     
     // SEO & Engagement
     metaTitle: data.metaTitle || title,
@@ -128,38 +140,30 @@ function toAboutContent(id: string, data: Record<string, any>): AboutPageContent
   } as AboutPageContent;
 }
 
-const getBaseArticlesPool = cache(async () => {
+/**
+ * getArticlesMetadataPool
+ * Client-safe fallback that fetches the latest 50 articles.
+ */
+const getArticlesMetadataPool = cache(async () => {
   try {
-    if (!db) return [];
-    
-    // Sort only by createdAt (Single Field Index - automatic)
-    const q = query(
-      collection(db, 'articles'),
-      orderBy('createdAt', 'desc'),
-      limit(200) // Fetch large enough buffer to filter in memory
-    );
-    
+    const q = query(collection(db, 'articles'), orderBy('createdAt', 'desc'), limit(50));
     const snap = await getDocs(q);
-    
-    // Fallback to mock data if Firestore is empty
     if (snap.empty) return [];
-
     return snap.docs.map(d => toArticle(d.id, d.data()));
   } catch (e) {
-    console.error('[data] getBaseArticlesPool error:', e);
+    console.error('[data-client] getArticlesMetadataPool error:', e);
     return [];
   }
 });
 
 /** 
  * Safe fetcher that avoids Composite Index requirements by filtering in memory.
- * Fetches the latest 200 articles by default.
  */
 async function fetchAndFilter(
   filterFn: (data: any) => boolean, 
   count: number
 ): Promise<NewsArticle[]> {
-  const pool = await getBaseArticlesPool();
+  const pool = await getArticlesMetadataPool();
   return pool.filter(filterFn).slice(0, count);
 }
 
@@ -207,17 +211,24 @@ export async function getArticlesByType(
 // --------------------------------------------------------------------------
 // Single article by slug
 // --------------------------------------------------------------------------
-export async function getArticleBySlug(slug: string): Promise<NewsArticle | null> {
+export const getArticleBySlug = cache(async (slug: string): Promise<NewsArticle | null> => {
+  const timerLabel = `[DB] getArticleBySlug(${slug})`;
+  console.time(timerLabel);
   try {
-    if (!db) return null;
+    if (!db) {
+      console.timeEnd(timerLabel);
+      return null;
+    }
     const q = query(collection(db, 'articles'), where('slug', '==', slug), limit(1));
     const snap = await getDocs(q);
+    console.timeEnd(timerLabel);
     if (!snap.empty) return toArticle(snap.docs[0].id, snap.docs[0].data());
   } catch (e) {
     console.error(`[data] getArticleBySlug(${slug}) error:`, e);
+    console.timeEnd(timerLabel);
   }
   return null;
-}
+});
 
 // --------------------------------------------------------------------------
 // Breaking / Trending / Tags
@@ -244,7 +255,15 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
     const snap = await getDocs(q);
     if (!snap.empty) {
       const d = snap.docs[0].data();
-      return { id: snap.docs[0].id, name: d.name, slug: d.slug, description: d.description } as Category;
+      const fallback = CATEGORY_FALLBACK_MAP[d.slug];
+      return { 
+        id: snap.docs[0].id, 
+        name: d.name_hi || fallback?.hi || d.name || 'सामान्य',
+        name_hi: d.name_hi || fallback?.hi || d.name || 'सामान्य',
+        name_en: d.name_en || fallback?.en || d.name || 'General',
+        slug: d.slug, 
+        description: d.description_hi || d.description 
+      } as Category;
     }
   } catch (e) {
     console.error(`[data] getCategoryBySlug error:`, e);
@@ -260,24 +279,43 @@ export async function getAllCategories(): Promise<Category[]> {
     
     if (snap.empty) return [];
 
-    return snap.docs.map(d => ({ id: d.id, ...d.data() } as Category));
+    return snap.docs.map(d => {
+      const data = d.data();
+      const fallback = CATEGORY_FALLBACK_MAP[data.slug];
+      return { 
+        id: d.id, 
+        ...data,
+        name: data.name_hi || fallback?.hi || data.name || 'सामान्य',
+        name_hi: data.name_hi || fallback?.hi || data.name || 'सामान्य',
+        name_en: data.name_en || fallback?.en || data.name || 'General',
+      } as Category;
+    });
   } catch (e) {
     console.error('[data] getAllCategories error:', e);
     return [];
   }
 }
 
-export async function getAuthorById(id: string): Promise<Author | null> {
-  try {
-    if (!db) return null;
-    const snap = await getDocs(query(collection(db, 'authors'), limit(100))); // Small collection
-    const doc = snap.docs.find(d => d.id === id);
-    if (doc) return { id: doc.id, ...doc.data() } as Author;
-  } catch (e) {
-    console.error(`[data] getAuthorById error:`, e);
+export const getAuthorById = cache(
+  async (id: string): Promise<Author | null> => {
+    const timerLabel = `[DB: Client] getAuthorById(${id})`;
+    console.time(timerLabel);
+    try {
+      if (!db) {
+         console.timeEnd(timerLabel);
+         return null;
+      }
+      const snap = await getDocs(query(collection(db, 'authors'), limit(100))); // Small collection
+      const docSnap = snap.docs.find(d => d.id === id);
+      console.timeEnd(timerLabel);
+      if (docSnap) return { id: docSnap.id, ...docSnap.data() } as Author;
+    } catch (e) {
+      console.error(`[data-client] getAuthorById error:`, e);
+      console.timeEnd(timerLabel);
+    }
+    return null;
   }
-  return null;
-}
+);
 
 export async function getVisualStories(): Promise<VisualStory[]> {
   try {

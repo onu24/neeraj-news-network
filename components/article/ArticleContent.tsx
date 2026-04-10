@@ -1,8 +1,12 @@
+'use client';
+
 import { CheckCircle2 } from 'lucide-react';
 import { ArticleContentFont } from '@/lib/types';
+import { useLanguage } from '@/components/providers/LanguageProvider';
 
 interface ArticleContentProps {
   content?: string;
+  content_hi?: string;
   keyPoints?: string[];
   articleType?: string;
   contentFont?: ArticleContentFont;
@@ -18,12 +22,17 @@ const FONT_CLASS_MAP: Record<ArticleContentFont, string> = {
   playfair: 'font-playfair',
 };
 
-export function ArticleContent({ content, keyPoints, articleType, contentFont = 'serif' }: ArticleContentProps) {
-  if (!content && !keyPoints) return null;
+export function ArticleContent({ content, content_hi, keyPoints, articleType, contentFont = 'serif' }: ArticleContentProps) {
+  const { language, t } = useLanguage();
+  
+  // Choose correct content based on language
+  const displayContent = (language === 'hi' && content_hi) ? content_hi : content;
+  
+  if (!displayContent && (!keyPoints || keyPoints.length === 0)) return null;
 
   // Parse markdown-like content (simple paragraphs separated by double newlines)
-  const paragraphs = content?.split('\n\n').filter(p => p.trim()) || [];
-  const fontClass = FONT_CLASS_MAP[contentFont] || FONT_CLASS_MAP.serif;
+  const paragraphs = displayContent?.split('\n\n').filter(p => p.trim()) || [];
+  const fontClass = language === 'hi' ? 'font-hindi' : (FONT_CLASS_MAP[contentFont] || FONT_CLASS_MAP.serif);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -34,7 +43,7 @@ export function ArticleContent({ content, keyPoints, articleType, contentFont = 
           <div className="bg-blue-50 border-l-4 border-blue-600 p-6 my-10 rounded-r-md">
             <h3 className="text-blue-900 font-bold text-xl mb-4 flex items-center gap-2 m-0 font-sans">
               <CheckCircle2 className="h-5 w-5" />
-              In Brief: Key Takeaways
+              {t('key_highlights')}
             </h3>
             <ul className="space-y-3 m-0 list-none p-0">
               {keyPoints.map((point, i) => (

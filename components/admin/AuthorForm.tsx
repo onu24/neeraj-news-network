@@ -20,7 +20,7 @@ interface AuthorFormProps {
   onSuccess?: () => void;
 }
 
-const DEFAULT_AVATAR = '/images/placeholders/avatar-placeholder.jpg';
+const DEFAULT_AVATAR = '/placeholder-user.jpg';
 
 export function AuthorForm({ author, onClose, onSuccess }: AuthorFormProps) {
   const router = useRouter();

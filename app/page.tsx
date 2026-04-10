@@ -17,7 +17,7 @@ import {
   getLatestArticles, 
   getArticlesByCategory,
   getArticlesByType,
-} from '@/lib/data';
+} from '@/lib/data-server';
 
 // Exported ISR Revalidation
 export const revalidate = 60;
@@ -28,6 +28,7 @@ export const metadata = {
 };
 
 export default async function Home() {
+
   const [
     featured,
     latest,
@@ -69,6 +70,7 @@ export default async function Home() {
   const hasJobsNews = jobsNews.length > 0;
   const hasExamsNews = examsNews.length > 0;
 
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <TopBar />
@@ -93,7 +95,6 @@ export default async function Home() {
         {/* India News: Editorial Feature */}
         {hasIndiaNews && (
           <SectionBlock
-            title="National News"
             category="india"
             articles={indiaNews}
             variant="feature"
@@ -104,7 +105,6 @@ export default async function Home() {
         {hasEconomyNews && (
           <div className="bg-zinc-50 border-y border-border/40 py-4">
             <SectionBlock
-              title="Markets & Economy"
               category="economy"
               articles={economyNews}
               variant="grid"
@@ -118,7 +118,6 @@ export default async function Home() {
         {/* Politics: Dynamic Side-by-Side */}
         {hasPoliticsNews && (
           <SectionBlock
-            title="Politics & Policy"
             category="politics"
             articles={politicsNews}
             variant="side-by-side"
@@ -132,7 +131,6 @@ export default async function Home() {
         {/* Tech: Grid Layout */}
         {hasTechNews && (
           <SectionBlock
-            title="Technology & Startup"
             category="technology"
             articles={techNews}
             variant="grid"
@@ -152,7 +150,6 @@ export default async function Home() {
           <div className="bg-zinc-50 border-y border-border/40 py-4">
             {hasSportsNews && (
               <SectionBlock
-                title="Sports Pulse"
                 category="sports"
                 articles={sportsNews}
                 variant="grid"
@@ -160,7 +157,6 @@ export default async function Home() {
             )}
             {hasEntertainmentNews && (
               <SectionBlock
-                title="Showbiz"
                 category="entertainment"
                 articles={entertainNews}
                 variant="grid"
@@ -174,7 +170,6 @@ export default async function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 max-w-7xl mx-auto px-4 gap-12 py-10">
             {hasJobsNews && (
               <SectionBlock
-                title="Career & Jobs"
                 category="jobs"
                 articles={jobsNews}
                 variant="minimal-list"
@@ -182,7 +177,6 @@ export default async function Home() {
             )}
             {hasExamsNews && (
               <SectionBlock
-                title="Education & competitive"
                 category="exams"
                 articles={examsNews}
                 variant="minimal-list"

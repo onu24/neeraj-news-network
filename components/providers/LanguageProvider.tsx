@@ -12,20 +12,22 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 const FALLBACK_LANGUAGE_CONTEXT: LanguageContextType = {
-  language: 'en',
+  language: 'hi',
   setLanguage: () => {
     // no-op fallback used only when provider is not mounted
   },
   t: (key: string | TranslationKey) => {
-    return (TRANSLATIONS.en as any)[key] || String(key);
+    return (TRANSLATIONS.hi as any)[key] || String(key);
   },
 };
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>('hi');
+  const [mounted, setMounted] = useState(false);
 
   // Load language from localStorage on mount
   useEffect(() => {
+    setMounted(true);
     const savedLanguage = localStorage.getItem('drishyam_language') as Language;
     if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'hi')) {
       setLanguageState(savedLanguage);
@@ -40,7 +42,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   const t = (key: string | TranslationKey) => {
-    const langDict = TRANSLATIONS[language];
+    // During hydration (unmounted), always use 'hi' to match server output
+    // After mount, switch to active selected language
+    const langToUse = mounted ? language : 'hi';
+    const langDict = TRANSLATIONS[langToUse];
     // Return translation if exists, otherwise return the key itself
     return (langDict as any)[key] || key;
   };
@@ -56,7 +61,7 @@ export function useLanguage() {
   const context = useContext(LanguageContext);
   if (context === undefined) {
     if (process.env.NODE_ENV !== 'production') {
-      console.warn('[LanguageProvider] useLanguage called outside provider. Falling back to English defaults.');
+      console.warn('[LanguageProvider] useLanguage called outside provider. Falling back to Hindi defaults.');
     }
     return FALLBACK_LANGUAGE_CONTEXT;
   }

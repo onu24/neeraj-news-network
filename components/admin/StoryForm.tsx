@@ -101,7 +101,7 @@ export function StoryForm({ story }: StoryFormProps) {
 
     const validTypes =
       mediaType === 'image'
-        ? ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+        ? ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']
         : ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
 
     if (!validTypes.includes(file.type)) {
@@ -315,75 +315,94 @@ export function StoryForm({ story }: StoryFormProps) {
                   placeholder="Slide caption"
                 />
 
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="url"
-                      value={slide.image}
-                      onChange={(e) => handleSlideChange(index, 'image', e.target.value)}
-                      className={`w-full bg-background p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 ${
-                        validationErrors[`slide_${index}_media`] ? 'border-red-300' : 'border-border'
-                      }`}
-                      placeholder="Slide image URL"
-                    />
-                    <label className="inline-flex items-center gap-2 px-3 py-2 border border-border rounded-md text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-secondary transition-colors">
-                      <ImagePlus size={14} />
-                      {uploadingSlideIndex === index ? 'Uploading...' : 'Upload Image'}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        disabled={uploadingSlideIndex !== null}
-                        onChange={(e) => handleSlideFileSelect(index, e.target.files?.[0], 'image')}
-                      />
-                    </label>
-                  </div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Image URL Section */}
+                    <div className="space-y-2">
+                      <label className="block text-[9px] font-black uppercase tracking-widest text-muted-foreground">Slide Image</label>
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <input
+                            type="url"
+                            value={slide.image}
+                            onChange={(e) => handleSlideChange(index, 'image', e.target.value)}
+                            className={`w-full bg-background p-3 border rounded-lg text-sm focus:ring-2 focus:ring-primary/20 ${
+                              validationErrors[`slide_${index}_media`] ? 'border-red-300' : 'border-border'
+                            }`}
+                            placeholder="Image URL (Unsplash/Imgur etc.)"
+                          />
+                        </div>
+                        <label className="p-2 border border-border rounded-lg cursor-pointer hover:bg-secondary transition-colors" title="Upload Image">
+                          <ImagePlus size={18} className={uploadingSlideIndex === index ? 'animate-pulse text-primary' : ''} />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            disabled={uploadingSlideIndex !== null}
+                            onChange={(e) => handleSlideFileSelect(index, e.target.files?.[0], 'image')}
+                          />
+                        </label>
+                      </div>
+                    </div>
 
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="url"
-                      value={slide.video}
-                      onChange={(e) => handleSlideChange(index, 'video', e.target.value)}
-                      className={`w-full bg-background p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 ${
-                        validationErrors[`slide_${index}_media`] ? 'border-red-300' : 'border-border'
-                      }`}
-                      placeholder="Slide video URL (optional)"
-                    />
-                    <label className="inline-flex items-center gap-2 px-3 py-2 border border-border rounded-md text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-secondary transition-colors">
-                      <Video size={14} />
-                      {uploadingSlideIndex === index ? 'Uploading...' : 'Upload Video'}
-                      <input
-                        type="file"
-                        accept="video/mp4,video/webm,video/ogg,video/quicktime"
-                        className="hidden"
-                        disabled={uploadingSlideIndex !== null}
-                        onChange={(e) => handleSlideFileSelect(index, e.target.files?.[0], 'video')}
-                      />
-                    </label>
+                    {/* Video URL Section */}
+                    <div className="space-y-2">
+                      <label className="block text-[9px] font-black uppercase tracking-widest text-muted-foreground">Slide Video (Optional)</label>
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <input
+                            type="url"
+                            value={slide.video}
+                            onChange={(e) => handleSlideChange(index, 'video', e.target.value)}
+                            className="w-full bg-background p-3 border rounded-lg text-sm focus:ring-2 focus:ring-primary/20 border-border"
+                            placeholder="Video URL (.mp4, .webm)"
+                          />
+                        </div>
+                        <label className="p-2 border border-border rounded-lg cursor-pointer hover:bg-secondary transition-colors" title="Upload Video">
+                          <Video size={18} className={uploadingSlideIndex === index ? 'animate-pulse text-primary' : ''} />
+                          <input
+                            type="file"
+                            accept="video/mp4,video/webm,video/ogg,video/quicktime"
+                            className="hidden"
+                            disabled={uploadingSlideIndex !== null}
+                            onChange={(e) => handleSlideFileSelect(index, e.target.files?.[0], 'video')}
+                          />
+                        </label>
+                      </div>
+                    </div>
                   </div>
 
                   {validationErrors[`slide_${index}_media`] && (
-                    <p className="text-xs text-red-600">{validationErrors[`slide_${index}_media`]}</p>
+                    <p className="text-[10px] font-bold text-red-600 uppercase tracking-widest">{validationErrors[`slide_${index}_media`]}</p>
                   )}
 
-                  <div className="flex items-start gap-3">
-                    {slide.image && (
-                      <img
-                        src={slide.image}
-                        alt={`Slide ${index + 1}`}
-                        className="h-36 w-24 rounded-md object-cover border border-border"
-                      />
-                    )}
-                    {slide.video && (
-                      <video
-                        src={slide.video}
-                        className="h-36 w-24 rounded-md object-cover border border-border bg-black"
-                        muted
-                        playsInline
-                        controls
-                      />
-                    )}
-                  </div>
+                  {(slide.image || slide.video) && (
+                    <div className="flex items-start gap-4 p-3 bg-secondary/20 rounded-lg animate-in fade-in duration-300">
+                      {slide.image && (
+                        <div className="space-y-1">
+                          <p className="text-[8px] font-black uppercase tracking-tighter text-muted-foreground">Image Preview</p>
+                          <img
+                            src={slide.image}
+                            alt={`Slide ${index + 1}`}
+                            className="h-40 w-28 rounded-md object-cover border border-border shadow-sm bg-white"
+                            onError={(e) => (e.currentTarget.src = '/placeholder-story.jpg')}
+                          />
+                        </div>
+                      )}
+                      {slide.video && (
+                        <div className="space-y-1">
+                          <p className="text-[8px] font-black uppercase tracking-tighter text-muted-foreground">Video Preview</p>
+                          <video
+                            src={slide.video}
+                            className="h-40 w-28 rounded-md object-cover border border-border bg-black shadow-sm"
+                            muted
+                            playsInline
+                            controls
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -59,7 +59,7 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            className={`flex items-center gap-2 px-4 py-2 rounded-full border border-border text-sm font-medium transition-all ${link.color}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full border border-border text-sm font-medium transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:shadow-md active:scale-95 ${link.color}`}
           >
             {link.icon}
             {link.name}
@@ -67,8 +67,11 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
         ))}
         
         <button
+          suppressHydrationWarning
           onClick={handleCopy}
-          className="flex items-center gap-2 px-4 py-2 rounded-full border border-border text-sm font-medium hover:bg-secondary transition-all"
+          className={`flex items-center gap-2 px-4 py-2 rounded-full border border-border text-sm font-medium transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:shadow-md active:scale-95 ${
+            copied ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' : 'hover:bg-secondary'
+          }`}
         >
           <Link2 className="h-4 w-4" />
           {copied ? 'Link Copied!' : 'Copy Link'}

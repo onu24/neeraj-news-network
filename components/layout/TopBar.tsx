@@ -27,7 +27,7 @@ export function TopBar() {
     <div className="bg-secondary/50 border-b border-border py-1.5 px-3 sm:px-4 text-[11px] sm:text-xs font-medium text-muted-foreground w-full z-50 relative">
       <div className="max-w-7xl mx-auto flex items-center justify-end sm:justify-between gap-3">
         {/* Date */}
-        <div className="tracking-wide hidden sm:block">{dateStr}</div>
+        <div className="tracking-wide hidden sm:block">{mounted ? dateStr : ''}</div>
 
         {/* Right side controls */}
         <div className="flex items-center gap-3 sm:gap-4 ml-auto">
@@ -35,6 +35,7 @@ export function TopBar() {
           <div className="flex items-center gap-2 bg-background/70 border border-border rounded-full px-2.5 py-1">
             <button
               onClick={() => setLanguage('en')}
+              suppressHydrationWarning
               className={`hover:text-foreground transition-colors leading-none ${
                 language === 'en' ? 'text-foreground font-bold underline decoration-primary underline-offset-4' : ''
               }`}
@@ -44,6 +45,7 @@ export function TopBar() {
             <span className="text-border">|</span>
             <button
               onClick={() => setLanguage('hi')}
+              suppressHydrationWarning
               className={`font-hindi hover:text-foreground transition-colors leading-none ${
                 language === 'hi' ? 'text-foreground font-bold underline decoration-primary underline-offset-4' : 'font-medium'
               }`}

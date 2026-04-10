@@ -3,18 +3,21 @@ export type Language = 'en' | 'hi';
 export const TRANSLATIONS = {
   en: {
     // Navbar / Categories
-    home: 'Home',
-    latest: 'Latest',
-    india: 'India',
-    states: 'States',
-    politics: 'Politics',
-    economy: 'Economy',
-    technology: 'Tech',
-    sports: 'Sports',
-    explainers: 'Explainers',
-    videos: 'Videos',
-    jobs: 'Jobs',
-    exams: 'Exams',
+    news_analysis: 'News & Analysis',
+    home: 'HOME',
+    latest: 'LATEST',
+    india: 'INDIA',
+    states: 'STATES',
+    politics: 'POLITICS',
+    economy: 'ECONOMY',
+    technology: 'TECHNOLOGY',
+    sports: 'SPORTS',
+    entertainment: 'ENTERTAINMENT',
+    explainers: 'EXPLAINERS',
+    videos: 'VIDEOS',
+    jobs: 'JOBS',
+    exams: 'EXAMS',
+    visual_stories: 'VISUAL STORIES',
 
     // Section Titles
     national_news: 'India / National',
@@ -28,9 +31,9 @@ export const TRANSLATIONS = {
     entertainment_news: 'Entertainment',
     opinion: 'Opinion',
     must_watch: 'Must Watch',
-    visual_stories: 'Visual Stories',
     trending: 'Trending Now',
     latest_updates: 'Latest Updates',
+    top_stories: 'Top Stories',
 
     // UI Labels
     breaking: 'Breaking',
@@ -57,23 +60,47 @@ export const TRANSLATIONS = {
     contact: 'Contact',
     privacy: 'Privacy Policy',
     terms: 'Terms of Service',
+    notifications_coming_soon: 'Notifications coming soon',
+    notifications_desc: 'We will alert you when breaking stories and updates are available.',
     made_for_india: 'Made for India. © 2026 Drishyam News.',
+
+    // Newsletter
+    daily_briefing: 'Daily Briefing',
+    newsletter_intro: 'The only newsletter you\'ll ever need to stay informed.',
+    subscribe_free: 'Subscribe for Free',
+    agree_terms: 'By subscribing, you agree to our Terms of Service and Privacy Policy.',
+    email_placeholder: 'Your email address',
+    email_required: 'Email is required',
+    invalid_email: 'Invalid email',
+    subscribed_success: 'Subscribed successfully',
+
+    // Badges & Labels
+    analysis: 'Analysis',
+    live: 'LIVE',
+    read: 'READ',
+    published_on: 'Published on',
+    media_archive: 'Media Archive / Drishyam News Network',
+    share_story: 'Share this story',
+    back_home: 'Back to Home',
+    view_all: 'View All',
   },
   hi: {
     // Navbar / Categories
+    news_analysis: 'समाचार एवं विश्लेषण',
     home: 'होम',
     latest: 'ताज़ा',
     india: 'भारत',
     states: 'राज्य',
     politics: 'राजनीति',
     economy: 'अर्थव्यवस्था',
-    technology: 'टेक',
+    technology: 'टेक्नोलॉजी',
     sports: 'खेल',
     entertainment: 'मनोरंजन',
     explainers: 'एक्सप्लेनर्स',
     videos: 'वीडियो',
     jobs: 'नौकरी',
     exams: 'परीक्षा',
+    visual_stories: 'विजुअल स्टोरीज',
 
     // Section Titles
     national_news: 'भारत / राष्ट्रीय',
@@ -87,9 +114,9 @@ export const TRANSLATIONS = {
     entertainment_news: 'मनोरंजन',
     opinion: 'विचार',
     must_watch: 'ज़रूर देखें',
-    visual_stories: 'विजुअल स्टोरीज',
     trending: 'ट्रेंडिंग न्यूज़',
     latest_updates: 'ताज़ा अपडेट',
+    top_stories: 'प्रमुख खबरें',
 
     // UI Labels
     breaking: 'breaking',
@@ -116,8 +143,49 @@ export const TRANSLATIONS = {
     contact: 'संपर्क करें',
     privacy: 'गोपनीयता नीति',
     terms: 'सेवा की शर्तें',
+    notifications_coming_soon: 'नोटिफिकेशन जल्द आ रहे हैं',
+    notifications_desc: 'जब भी ब्रेकिंग स्टोरीज़ और अपडेट उपलब्ध होंगे, हम आपको सूचित करेंगे।',
     made_for_india: 'भारत के लिए निर्मित। © 2026 Drishyam News.',
+
+    // Newsletter
+    daily_briefing: 'डेली ब्रीफिंग',
+    newsletter_intro: 'सूचित रहने के लिए एकमात्र न्यूज़लेटर जिसकी आपको ज़रूरत है।',
+    subscribe_free: 'मुफ़्त सब्सक्राइब करें',
+    agree_terms: 'सब्सक्राइब करके, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।',
+    email_placeholder: 'आपका ईमेल पता',
+    email_required: 'ईमेल आवश्यक है',
+    invalid_email: 'अमान्य ईमेल',
+    subscribed_success: 'सफलतापूर्वक सब्सक्राइब किया गया',
+
+    // Badges & Labels
+    analysis: 'विश्लेषण',
+    live: 'लाइव',
+    read: 'पढ़ें',
+    published_on: 'प्रकाशित',
+    media_archive: 'मीडिया आर्काइव / दृश्यम न्यूज नेटवर्क',
+    share_story: 'इस खबर को शेयर करें',
+    back_home: 'होम पर वापस जाएं',
+    view_all: 'सभी देखें',
   }
 };
 
 export type TranslationKey = keyof typeof TRANSLATIONS.en;
+
+/**
+ * CATEGORY_FALLBACK_MAP
+ * Provides Hindi labels for existing categories by slug if name_hi is missing in DB.
+ */
+export const CATEGORY_FALLBACK_MAP: Record<string, { hi: string, en: string }> = {
+  'india': { hi: 'भारत', en: 'INDIA' },
+  'states': { hi: 'राज्य', en: 'STATES' },
+  'politics': { hi: 'राजनीति', en: 'POLITICS' },
+  'economy': { hi: 'अर्थव्यवस्था', en: 'ECONOMY' },
+  'technology': { hi: 'टेक्नोलॉजी', en: 'TECHNOLOGY' },
+  'sports': { hi: 'खेल', en: 'SPORTS' },
+  'entertainment': { hi: 'मनोरंजन', en: 'ENTERTAINMENT' },
+  'jobs': { hi: 'नौकरी', en: 'JOBS' },
+  'exams': { hi: 'परीक्षा', en: 'EXAMS' },
+  'explainers': { hi: 'एक्सप्लेनर्स', en: 'EXPLAINERS' },
+  'videos': { hi: 'वीडियो', en: 'VIDEOS' },
+  'visual-stories': { hi: 'विजुअल स्टोरीज', en: 'VISUAL STORIES' },
+};

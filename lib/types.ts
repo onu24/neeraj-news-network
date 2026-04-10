@@ -11,9 +11,12 @@ export type ArticleContentFont =
 
 export interface Category {
   id: string;
-  name: string;
+  name: string; // Internal/Default (usually Hindi now)
+  name_hi: string; // Explicit Hindi
+  name_en?: string; // Optional English translation
   slug: string;
   description?: string;
+  description_hi?: string;
   order?: number;
   metaTitle?: string;
   metaDescription?: string;
@@ -36,11 +39,14 @@ export interface Article {
   // Core Identifiers
   id: string;
   title: string;
+  title_hi?: string;
   slug: string;
   
   // Content
   excerpt: string;
+  excerpt_hi?: string;
   content: string;
+  content_hi?: string;
   keyPoints?: string[];
   contentFont?: ArticleContentFont;
   articleType: ArticleType;
@@ -52,7 +58,8 @@ export interface Article {
   
   // Metadata & Taxonomy
   categoryId: string;
-  category: string; // Display Name
+  category: string; // Display Name (EN)
+  category_hi: string; // Display Name (HI)
   categorySlug: string;
   authorId: string;
   tags: string[];

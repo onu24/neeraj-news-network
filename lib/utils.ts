@@ -26,4 +26,4 @@ export function slugify(text: string): string {
 }
 
 export const FALLBACK_IMAGE = '/images/placeholders/news-placeholder.jpg';
-export const FALLBACK_AVATAR = '/images/placeholders/avatar-placeholder.jpg';
+export const FALLBACK_AVATAR = '/placeholder-user.jpg';

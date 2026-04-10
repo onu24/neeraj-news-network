@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { AlertCircle, Camera, CheckCircle2, X } from 'lucide-react';
+import { AlertCircle, Camera, CheckCircle2, X, Link as LinkIcon } from 'lucide-react';
 
 interface AvatarUploadProps {
   onAvatarUpload: (url: string) => void;
@@ -28,7 +28,9 @@ export function AvatarUpload({
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [urlValue, setUrlValue] = useState(currentAvatar || '');
   const [previewUrl, setPreviewUrl] = useState<string>(currentAvatar || DEFAULT_AVATAR);
+  const [showUpload, setShowUpload] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -37,10 +39,27 @@ export function AvatarUpload({
 
   useEffect(() => {
     setPreviewUrl(currentAvatar || DEFAULT_AVATAR);
+    setUrlValue(currentAvatar || '');
   }, [currentAvatar]);
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.trim();
+    setUrlValue(val);
+    
+    if (val === '') {
+      setPreviewUrl(DEFAULT_AVATAR);
+      onAvatarUpload('');
+      return;
+    }
+
+    setPreviewUrl(val);
+    onAvatarUpload(val);
+    setError(null);
+  };
 
   const clearAvatar = () => {
     setPreviewUrl(DEFAULT_AVATAR);
+    setUrlValue('');
     onAvatarUpload('');
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -49,7 +68,7 @@ export function AvatarUpload({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
     if (!validTypes.includes(file.type)) {
       setError('Invalid format. Please use JPG, PNG, WebP or GIF.');
       return;
@@ -85,9 +104,11 @@ export function AvatarUpload({
       }
 
       setPreviewUrl(result.url);
+      setUrlValue(result.url);
       onAvatarUpload(result.url);
       setUploading(false);
       setProgress(0);
+      setShowUpload(false);
     } catch (err) {
       console.warn('[AvatarUpload] Upload error:', err);
       setError(`Upload failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -97,67 +118,106 @@ export function AvatarUpload({
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-4">
-        <div className="relative h-24 w-24 rounded-full overflow-hidden border-2 border-border bg-secondary/40">
-          <Image
-            src={previewUrl}
-            alt={alt}
-            fill
-            sizes="96px"
-            className="object-cover"
-          />
-          {!uploading && previewUrl !== DEFAULT_AVATAR && (
+    <div className="space-y-4">
+      <div className="flex flex-col gap-3">
+        {/* URL Input */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-muted-foreground">
+               <LinkIcon size={14} />
+             </div>
+             <input
+               type="url"
+               value={urlValue}
+               onChange={handleUrlChange}
+               placeholder="Avatar image URL..."
+               className="w-full bg-background pl-9 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs font-medium"
+             />
+          </div>
+          {!showUpload && !uploading && (
             <button
               type="button"
-              onClick={clearAvatar}
-              className="absolute -top-1 -right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-              aria-label="Remove avatar"
+              onClick={() => setShowUpload(true)}
+              className="p-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-zinc-200 transition-colors"
+              title="Upload file"
             >
-              <X size={12} />
+              <Camera size={16} />
             </button>
           )}
-          {!uploading && previewUrl !== DEFAULT_AVATAR && (
-            <div className="absolute bottom-0 right-0 p-1 bg-emerald-500 text-white rounded-full">
-              <CheckCircle2 size={12} />
-            </div>
-          )}
         </div>
 
-        <div className="space-y-2">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            disabled={uploading}
-            className="hidden"
-            id={inputId}
-          />
-          <label
-            htmlFor={inputId}
-            className={`inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground font-bold uppercase tracking-wide text-xs rounded-sm hover:bg-black transition-colors cursor-pointer ${
-              uploading ? 'opacity-50 pointer-events-none' : ''
-            }`}
-          >
-            <Camera size={14} />
-            {uploading ? 'Uploading...' : buttonLabel}
-          </label>
-          <p className="text-[11px] text-muted-foreground">JPG, PNG, WebP or GIF. Max 3MB.</p>
+        {/* Upload Toggle Area */}
+        {showUpload && (
+          <div className="p-4 border border-dashed border-primary/30 bg-primary/5 rounded-lg flex flex-col items-center gap-2 animate-in fade-in slide-in-from-top-1">
+             <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Upload Profile Photo</p>
+             <input
+               ref={fileInputRef}
+               type="file"
+               accept="image/*"
+               onChange={handleFileSelect}
+               disabled={uploading}
+               className="hidden"
+               id={inputId}
+             />
+             <label
+               htmlFor={inputId}
+               className={`px-4 py-1.5 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest rounded-sm hover:bg-black transition-colors cursor-pointer ${
+                 uploading ? 'opacity-50 pointer-events-none' : ''
+               }`}
+             >
+               {uploading ? 'Processing...' : 'Select File'}
+             </label>
+             <button onClick={() => setShowUpload(false)} className="text-[9px] font-bold uppercase text-muted-foreground hover:text-foreground">Cancel</button>
+          </div>
+        )}
+
+        {/* Preview & Status */}
+        <div className="flex items-center gap-4">
+          <div className="relative h-20 w-20 rounded-full overflow-hidden border-2 border-border bg-secondary/40">
+            <Image
+              src={previewUrl}
+              alt={alt}
+              fill
+              sizes="80px"
+              className="object-cover"
+              onError={() => setPreviewUrl(DEFAULT_AVATAR)}
+            />
+            {!uploading && previewUrl !== DEFAULT_AVATAR && (
+              <button
+                type="button"
+                onClick={clearAvatar}
+                className="absolute -top-1 -right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
+                aria-label="Remove avatar"
+              >
+                <X size={10} />
+              </button>
+            )}
+            {!uploading && previewUrl !== DEFAULT_AVATAR && (
+              <div className="absolute bottom-0 right-0 p-1 bg-emerald-500 text-white rounded-full">
+                <CheckCircle2 size={10} />
+              </div>
+            )}
+          </div>
+          
+          <div className="flex-1">
+            {uploading ? (
+               <div className="space-y-1">
+                 <div className="w-full bg-zinc-200 rounded-full h-1.5 overflow-hidden">
+                   <div
+                     className="bg-primary h-1.5 rounded-full transition-all duration-300 ease-out"
+                     style={{ width: `${progress}%` }}
+                   />
+                 </div>
+                 <p className="text-[9px] font-bold uppercase tracking-widest text-primary">Uploading... {progress}%</p>
+               </div>
+            ) : (
+                <p className="text-[10px] text-muted-foreground font-medium italic">
+                  Preview updates instantly when you paste a valid image link.
+                </p>
+            )}
+          </div>
         </div>
       </div>
-
-      {uploading && (
-        <div className="space-y-1">
-          <div className="w-full bg-zinc-200 rounded-full h-2 overflow-hidden">
-            <div
-              className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Uploading... {progress}%</p>
-        </div>
-      )}
 
       {error && (
         <div className="flex items-start gap-2 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-sm text-xs">

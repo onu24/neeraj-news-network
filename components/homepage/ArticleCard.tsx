@@ -23,14 +23,14 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
         day: 'numeric',
       });
     } catch (e) {
-      return 'Recently';
+      return language === 'hi' ? 'हाल ही में' : 'Recently';
     }
   };
 
-  const title = article.title;
-  const description = article.excerpt;
+  const displayTitle = (language === 'hi' && article.title_hi) ? article.title_hi : article.title;
+  const displayDescription = (language === 'hi' && article.excerpt_hi) ? article.excerpt_hi : article.excerpt;
   const imageUrl = article.coverImage;
-  const displayCategory = article.category || 'News';
+  const displayCategory = language === 'hi' ? (article.category_hi || 'न्यूज़') : (article.category || 'NEWS');
 
   if (variant === 'featured') {
     return (
@@ -39,14 +39,14 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
           {imageUrl ? (
             <Image
               src={imageUrl}
-              alt={title}
+              alt={displayTitle}
               fill
               className="object-cover group-hover:scale-[1.02] transition-transform duration-700"
               priority
             />
           ) : (
             <div className="w-full h-full bg-secondary/20 flex items-center justify-center font-serif text-muted-foreground italic">
-              Drishyam News Archive
+              {language === 'hi' ? 'दृश्यम न्यूज नेटवर्क' : 'Drishyam News Archive'}
             </div>
           )}
           <div className="absolute top-4 left-4">
@@ -56,16 +56,18 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
           </div>
         </div>
         <div className="space-y-4">
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] text-foreground group-hover:text-primary transition-colors">
-            {title}
+          <h2 className={`font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] text-foreground group-hover:text-primary transition-colors ${language === 'hi' ? 'font-hindi' : ''}`}>
+            {displayTitle}
           </h2>
-          <p className="text-lg text-muted-foreground line-clamp-3 leading-relaxed border-l-2 border-primary/20 pl-4 py-1 italic">
-            {description}
-          </p>
+          {displayDescription && (
+            <p className={`text-lg text-muted-foreground line-clamp-3 leading-relaxed border-l-2 border-primary/20 pl-4 py-1 italic ${language === 'hi' ? 'font-hindi' : ''}`}>
+              {displayDescription}
+            </p>
+          )}
           <div className="flex items-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest gap-3">
              <span>{formatDate(article.createdAt)}</span>
              <span className="w-1 h-1 bg-border rounded-full" />
-             <span>{Math.ceil(article.content.length / 1000)} min read</span>
+             <span>{Math.max(1, article.readingTime || 0)} {language === 'hi' ? 'मिनट' : 'm'} {t('read')}</span>
           </div>
         </div>
       </Link>
@@ -79,7 +81,7 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
           {imageUrl && (
             <Image
               src={imageUrl}
-              alt={title}
+              alt={displayTitle}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
             />
@@ -89,8 +91,8 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
           <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">
             {displayCategory}
           </p>
-          <h4 className="font-serif text-base sm:text-lg font-bold leading-snug text-foreground group-hover:text-primary transition-colors line-clamp-2">
-            {title}
+          <h4 className={`font-serif text-base sm:text-lg font-bold leading-snug text-foreground group-hover:text-primary transition-colors line-clamp-2 ${language === 'hi' ? 'font-hindi' : ''}`}>
+            {displayTitle}
           </h4>
           <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest mt-2">{formatDate(article.createdAt)}</p>
         </div>
@@ -105,7 +107,7 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
           {imageUrl && (
             <Image
               src={imageUrl}
-              alt={title}
+              alt={displayTitle}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
             />
@@ -114,8 +116,8 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
         <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-1">
           {displayCategory}
         </p>
-        <h3 className="font-serif text-base font-bold leading-snug text-foreground group-hover:text-primary transition-colors mb-2 line-clamp-2">
-          {title}
+        <h3 className={`font-serif text-base font-bold leading-snug text-foreground group-hover:text-primary transition-colors mb-2 line-clamp-2 ${language === 'hi' ? 'font-hindi' : ''}`}>
+          {displayTitle}
         </h3>
         <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{formatDate(article.createdAt)}</p>
       </Link>
@@ -128,7 +130,7 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
         {imageUrl && (
           <Image
             src={imageUrl}
-            alt={title}
+            alt={displayTitle}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
@@ -138,12 +140,12 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
         <p className="text-[10px] font-bold uppercase tracking-widest text-primary">
           {displayCategory}
         </p>
-        <h3 className="font-serif text-xl sm:text-2xl font-bold leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-3">
-          {title}
+        <h3 className={`font-serif text-xl sm:text-2xl font-bold leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-3 ${language === 'hi' ? 'font-hindi' : ''}`}>
+          {displayTitle}
         </h3>
-        {description && (
-          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-            {description}
+        {displayDescription && (
+          <p className={`text-sm text-muted-foreground line-clamp-2 leading-relaxed ${language === 'hi' ? 'font-hindi mt-1' : ''}`}>
+            {displayDescription}
           </p>
         )}
         <div className="flex items-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest pt-1 gap-2">

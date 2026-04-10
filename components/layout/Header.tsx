@@ -4,18 +4,40 @@ import Link from 'next/link';
 import { Search, Bell } from 'lucide-react';
 import { SearchInput } from './SearchInput';
 import { toast } from 'sonner';
+import { useState, useEffect } from 'react';
+import { useLanguage } from '@/components/providers/LanguageProvider';
 
 export function Header() {
+  const [scrolled, setScrolled] = useState(false);
+  const { language, t } = useLanguage();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleNotificationsClick = () => {
-    toast.info('Notifications coming soon', {
-      description: 'We will alert you when breaking stories and updates are available.',
+    toast.info(t('notifications_coming_soon'), {
+      description: t('notifications_desc'),
     });
   };
 
   return (
-    <header className="bg-background sticky top-0 z-40 border-b border-border">
+    <header 
+      suppressHydrationWarning
+      className={`sticky top-0 z-40 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        scrolled 
+          ? 'bg-background/80 backdrop-blur-md shadow-sm border-b border-border/50' 
+          : 'bg-background border-b border-border'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className={`flex items-center justify-between transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          scrolled ? 'h-14 sm:h-16' : 'h-16 sm:h-20'
+        }`}>
           
           {/* Logo Main Segment */}
           <Link href="/" className="flex-shrink-0 flex items-center gap-2 group">
@@ -23,8 +45,8 @@ export function Header() {
               <h1 className="font-serif text-4xl sm:text-5xl font-extrabold text-primary tracking-tight leading-none group-hover:opacity-90 transition-opacity">
                 Drishyam
               </h1>
-              <p className="text-[10px] sm:text-xs font-semibold text-muted-foreground tracking-widest uppercase mt-0.5 ml-1">
-                News & Analysis
+              <p className={`text-[10px] sm:text-xs font-semibold text-muted-foreground tracking-widest uppercase mt-0.5 ml-1 ${language === 'hi' ? 'font-hindi' : ''}`}>
+                {t('news_analysis')}
               </p>
             </div>
           </Link>
@@ -35,12 +57,17 @@ export function Header() {
               <SearchInput />
             </div>
 
-            <button aria-label="Search" className="md:hidden text-foreground hover:text-primary transition-colors p-2">
+            <button 
+              aria-label="Search" 
+              suppressHydrationWarning
+              className="md:hidden text-foreground hover:text-primary transition-colors p-2"
+            >
               <Search className="h-5 w-5" />
             </button>
             <button
               aria-label="Notifications"
               onClick={handleNotificationsClick}
+              suppressHydrationWarning
               className="text-foreground hover:text-primary transition-colors p-2 relative"
             >
               <Bell className="h-5 w-5" />

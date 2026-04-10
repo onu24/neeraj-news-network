@@ -119,8 +119,9 @@ export function CategoryManager({ initialCategories, categoryCounts }: CategoryM
             {categories.map((cat) => (
               <tr key={cat.id} className="hover:bg-secondary/20 transition-colors group">
                 <td className="py-4 px-6">
-                  <div className="font-medium text-foreground">{cat.name}</div>
-                  <div className="text-xs text-muted-foreground font-mono mt-0.5">/{cat.slug}</div>
+                  <div className="font-hindi text-lg font-bold text-foreground">{cat.name_hi || cat.name}</div>
+                  <div className="text-xs text-muted-foreground font-medium uppercase tracking-widest">{cat.name_en || 'NO ENGLISH LABEL'}</div>
+                  <div className="text-[10px] text-muted-foreground/60 font-mono mt-1">/{cat.slug}</div>
                 </td>
                 <td className="py-4 px-6 text-muted-foreground max-w-sm truncate">
                   {cat.description}

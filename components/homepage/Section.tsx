@@ -24,14 +24,28 @@ export function SectionBlock({
   variant = 'feature',
   children 
 }: SectionProps) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
 
   if (!articles || articles.length === 0) {
     return null;
   }
 
   const sectionSlug = slug || category || 'news';
-  const displayTitle = title || category?.toUpperCase() || 'NEWS';
+  
+  // Localized Title logic
+  let displayTitle = title;
+  if (category) {
+    const translated = t(category);
+    if (translated !== category) {
+      displayTitle = translated;
+    } else if (language === 'hi' && articles[0]?.category_hi) {
+      displayTitle = articles[0].category_hi;
+    }
+  }
+  
+  if (!displayTitle) {
+     displayTitle = category ? category.toUpperCase() : (language === 'hi' ? 'न्यूज़' : 'NEWS');
+  }
 
   return (
     <section className="bg-background border-b border-border/40 py-10 first:pt-4">
@@ -86,14 +100,14 @@ export function SectionBlock({
                 <div key={colIdx} className="space-y-6 first:pl-0 pl-10">
                   {articles.slice(colIdx * 2, (colIdx * 2) + 2).map((article) => (
                     <Link key={article.id} href={`/article/${article.slug}`} className="group block space-y-1.5">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-primary/70">
-                         {article.category}
+                      <p className={`text-[10px] font-bold uppercase tracking-widest text-primary/70 ${language === 'hi' ? 'font-hindi' : ''}`}>
+                         {language === 'hi' ? article.category_hi : article.category}
                       </p>
-                      <h4 className="font-serif text-lg font-bold leading-tight group-hover:text-primary transition-colors [text-wrap:balance]">
-                        {article.title}
+                      <h4 className={`font-serif text-lg font-bold leading-tight group-hover:text-primary transition-colors [text-wrap:balance] ${language === 'hi' ? 'font-hindi' : ''}`}>
+                        {language === 'hi' ? (article.title_hi || article.title) : article.title}
                       </h4>
                       <p className="text-[10px] text-muted-foreground uppercase font-medium tracking-widest">
-                         {new Date(article.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                         {new Date(article.createdAt).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                       </p>
                     </Link>
                   ))}

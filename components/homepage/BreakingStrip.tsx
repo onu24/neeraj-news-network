@@ -12,12 +12,15 @@ interface BreakingStripProps {
 import { useLanguage } from '@/components/providers/LanguageProvider';
 
 export function BreakingStrip({ articles }: BreakingStripProps) {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [needsClone, setNeedsClone] = useState(true);
-
+  
   // Use articles from props
   const items = articles;
+
+  const getDisplayTitle = (news: NewsArticle) => {
+    return (language === 'hi' && news.title_hi) ? news.title_hi : (news.headline || news.title);
+  };
 
   return (
     <div className="bg-background border-b-2 border-primary overflow-hidden relative flex h-10 w-full">
@@ -39,9 +42,9 @@ export function BreakingStrip({ articles }: BreakingStripProps) {
               )}
               <Link
                 href={`/article/${news.slug}`}
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors px-5"
+                className={`text-sm font-medium text-foreground hover:text-primary transition-colors px-5 ${language === 'hi' ? 'font-hindi' : ''}`}
               >
-                {news.headline || news.title}
+                {getDisplayTitle(news)}
               </Link>
             </div>
           ))}
@@ -57,9 +60,9 @@ export function BreakingStrip({ articles }: BreakingStripProps) {
               )}
               <Link
                 href={`/article/${news.slug}`}
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors px-5"
+                className={`text-sm font-medium text-foreground hover:text-primary transition-colors px-5 ${language === 'hi' ? 'font-hindi' : ''}`}
               >
-                {news.headline || news.title}
+                {getDisplayTitle(news)}
               </Link>
             </div>
           ))}

@@ -93,57 +93,12 @@ export function ArticleForm({ article, availableCategories = [], availableAuthor
     setGalleryImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleGalleryUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+  const [newGalleryUrl, setNewGalleryUrl] = useState('');
 
-    setIsUploadingGalleryImages(true);
-    setError(null);
-
-    const uploadedUrls: string[] = [];
-    const failedFiles: string[] = [];
-
-    try {
-      for (const file of Array.from(files)) {
-        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-        if (!validTypes.includes(file.type)) {
-          failedFiles.push(`${file.name} (invalid format)`);
-          continue;
-        }
-
-        const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-        if (file.size > MAX_SIZE) {
-          failedFiles.push(`${file.name} (too large)`);
-          continue;
-        }
-
-        try {
-          const uploadBody = new FormData();
-          uploadBody.append('file', file);
-          uploadBody.append('folder', 'articles/gallery');
-
-          const { uploadImageAction } = await import('@/lib/actions/dashboard-actions');
-          const result = await uploadImageAction(uploadBody);
-
-          if (!result.success || !result.url) {
-            throw new Error(result.error || 'Upload failed');
-          }
-
-          uploadedUrls.push(result.url);
-        } catch {
-          failedFiles.push(file.name);
-        }
-      }
-
-      if (uploadedUrls.length > 0) {
-        setGalleryImages((prev) => Array.from(new Set([...prev, ...uploadedUrls])));
-      }
-
-      if (failedFiles.length > 0) {
-        setError(`Some gallery images failed to upload: ${failedFiles.join(', ')}`);
-      }
-    } finally {
-      setIsUploadingGalleryImages(false);
-    }
+  const handleAddGalleryUrl = () => {
+    if (!newGalleryUrl.trim()) return;
+    setGalleryImages((prev) => Array.from(new Set([...prev, newGalleryUrl.trim()])));
+    setNewGalleryUrl('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -301,20 +256,25 @@ export function ArticleForm({ article, availableCategories = [], availableAuthor
                       Upload extra photos for this article. On mobile these will show as swipe slides.
                     </p>
                   </div>
-                  <label className="inline-flex items-center gap-2 px-3 py-2 border border-border rounded-md text-[11px] font-bold uppercase tracking-wider cursor-pointer hover:bg-secondary transition-colors">
-                    {isUploadingGalleryImages ? 'Uploading...' : 'Upload Images'}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      disabled={isUploadingGalleryImages}
-                      onChange={(e) => {
-                        handleGalleryUpload(e.target.files);
-                        e.target.value = '';
-                      }}
-                    />
-                  </label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                       <input
+                        type="url"
+                        placeholder="Paste image URL for gallery..."
+                        className="w-full bg-background p-3 border rounded-lg text-sm focus:ring-2 focus:ring-primary/20"
+                        value={newGalleryUrl}
+                        onChange={(e) => setNewGalleryUrl(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddGalleryUrl())}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddGalleryUrl}
+                      className="px-4 py-2 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest rounded-md hover:bg-black transition-colors"
+                    >
+                      Add URL
+                    </button>
+                  </div>
                 </div>
 
                 {galleryImages.length > 0 && (
