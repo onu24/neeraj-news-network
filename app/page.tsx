@@ -12,6 +12,8 @@ import { VisualStories } from '@/components/homepage/VisualStories';
 import { FeedPersonalization } from '@/components/homepage/FeedPersonalization';
 import { AdContainer } from '@/components/AdContainer';
 import { Reveal } from '@/components/animations/Reveal';
+import { SportsScoreboard } from '@/components/sports/SportsScoreboard';
+import { getLiveCricketScores } from '@/lib/cricket';
 
 import { 
   getFeaturedArticle, 
@@ -46,6 +48,7 @@ export default async function Home() {
     opinionArticles,
     videoArticles,
     visualStories,
+    liveMatches,
   ] = await Promise.all([
     getFeaturedArticle(),
     getLatestArticles(12),
@@ -61,6 +64,7 @@ export default async function Home() {
     getArticlesByType('opinion', 4),
     getArticlesByType('video', 5),
     getVisualStories(),
+    getLiveCricketScores(),
   ]);
 
   const leadArticle = featured || latest[0];
@@ -75,13 +79,17 @@ export default async function Home() {
   const hasJobsNews = jobsNews.length > 0;
   const hasExamsNews = examsNews.length > 0;
 
-
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <TopBar />
       <Header />
       <Navbar />
       <BreakingStrip articles={latest.slice(0, 5)} />
+      
+      {/* Real-time IPL Updates - Show on Home if an IPL match is LIVE or UPCOMING */}
+      {liveMatches.some((m: any) => (m.status === 'LIVE' || m.status === 'UPCOMING') && m.isIPL) && (
+        <SportsScoreboard initialMatches={liveMatches} />
+      )}
       
       <main className="flex-1 w-full space-y-4">
         {/* Above the Fold: Lead Hierarchy */}

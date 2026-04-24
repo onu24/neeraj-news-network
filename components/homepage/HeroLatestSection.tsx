@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { NewsArticle } from '@/lib/types';
 import { useLanguage } from '@/components/providers/LanguageProvider';
+import { WeatherWidget } from '../layout/WeatherWidget';
 
 export interface HeroLatestSectionProps {
   leadArticle: NewsArticle;
@@ -94,6 +95,25 @@ export function HeroLatestSection({ leadArticle, latestArticles }: HeroLatestSec
 
             {/* Sidebar: Premium Feeds List */}
             <div className="lg:col-span-4 flex flex-col h-full border-t-2 lg:border-t-0 lg:border-l border-zinc-100 dark:border-zinc-900 pt-10 lg:pt-0 lg:pl-12">
+              
+              {/* Regional Weather Context */}
+              <div className="mb-10 p-6 bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900/80 dark:to-zinc-950 rounded-2xl border border-primary/10 shadow-xl shadow-black/5 relative overflow-hidden group/card hover:border-primary/30 transition-all duration-500">
+                 {/* Decorative background glow */}
+                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 blur-[80px] rounded-full group-hover/card:bg-primary/10 transition-colors" />
+                 
+                 <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-3">
+                       <span className="w-1 h-4 bg-primary rounded-full" />
+                       <span className="text-[11px] font-black uppercase tracking-[0.3em] text-foreground">Bilaspur Profile</span>
+                    </div>
+                    <div className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-40"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </div>
+                 </div>
+                 <WeatherWidget />
+              </div>
+
               <div className="flex items-center justify-between mb-10 pb-4 border-b border-zinc-200 dark:border-zinc-800">
                 <h3 className="font-black text-2xl uppercase tracking-tighter text-foreground flex items-center group/title cursor-default">
                   <span className="w-3 h-3 bg-primary mr-3 transform rotate-45 group-hover/title:rotate-[225deg] transition-transform duration-500" />

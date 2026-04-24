@@ -4,6 +4,8 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { ArticleCard } from '@/components/homepage/ArticleCard';
 import { CategorySidebar } from '@/components/category/CategorySidebar';
+import { SportsScoreboard } from '@/components/sports/SportsScoreboard';
+import { getLiveCricketScores } from '@/lib/cricket';
 import { 
   getArticlesByCategory, 
   getLatestGlobalArticles, 
@@ -29,11 +31,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [category, allArticles, latestGlobal, trending] = await Promise.all([
+  const isSports = slug === 'sports' || slug === 'खेल';
+
+  const [category, allArticles, latestGlobal, trending, liveMatches] = await Promise.all([
     getCategoryBySlug(slug),
     getArticlesByCategory(slug, 15),
     getLatestGlobalArticles(6),
-    getTrendingArticles(5)
+    getTrendingArticles(5),
+    isSports ? getLiveCricketScores() : Promise.resolve([])
   ]);
 
   if (!category) {
@@ -49,9 +54,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       <Header />
       <Navbar />
       
-      <main className="flex-1 w-full bg-white pb-20">
+      <main className="flex-1 w-full bg-white dark:bg-zinc-950 pb-20">
         {/* Category Header & Breadcrumbs */}
-        <div className="bg-secondary/10 border-b border-border/40 mb-10">
+        <div className="bg-secondary/10 dark:bg-zinc-900/50 border-b border-border/40 mb-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
             <nav className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-6">
               <Link href="/" className="hover:text-primary transition-colors">Home</Link>
@@ -75,6 +80,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             </div>
           </div>
         </div>
+
+        {/* Specialized Widgets for Categories */}
+        {isSports && <SportsScoreboard initialMatches={liveMatches} />}
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
