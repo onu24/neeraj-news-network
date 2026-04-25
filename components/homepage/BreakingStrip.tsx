@@ -33,7 +33,7 @@ export function BreakingStrip({ articles }: BreakingStripProps) {
 
   return (
     <div className={`bg-background dark:bg-zinc-950 border-b border-primary/20 overflow-hidden sticky md:relative z-30 flex h-10 md:h-12 w-full shadow-sm group/ticker transition-all duration-500 ${
-      scrolled ? 'top-[92px] md:top-auto' : 'top-[124px] md:top-auto'
+      scrolled ? 'top-[96px] md:top-auto' : 'top-[132px] md:top-auto'
     }`}>
       {/* Dynamic Breaking Badge */}
       <div className="relative bg-gradient-to-br from-primary via-[#d41f16] to-[#af1912] text-white font-black px-4 md:px-10 py-2 md:py-2.5 text-[9px] md:text-[11px] tracking-[0.2em] md:tracking-[0.25em] uppercase flex items-center whitespace-nowrap z-30 shadow-[10px_0_25px_-5px_rgba(0,0,0,0.3)] shrink-0 italic overflow-hidden">

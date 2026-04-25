@@ -7,12 +7,18 @@ import { useLanguage } from '@/components/providers/LanguageProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function TopBar() {
+  const [scrolled, setScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useLanguage();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const today = new Date();
@@ -24,7 +30,7 @@ export function TopBar() {
   });
 
   return (
-    <div className="bg-secondary/50 border-b border-border py-1.5 px-3 sm:px-4 text-[11px] sm:text-xs font-medium text-muted-foreground w-full z-50 sticky top-0 md:relative backdrop-blur-md">
+    <div className={`bg-secondary/50 border-b border-border py-1.5 px-3 sm:px-4 text-[11px] sm:text-xs font-medium text-muted-foreground w-full z-50 sticky top-0 md:relative backdrop-blur-md transition-transform duration-500 ease-in-out ${scrolled ? 'translate-y-[-100%] md:translate-y-0' : 'translate-y-0'}`}>
       <div className="max-w-7xl mx-auto flex items-center justify-end sm:justify-between gap-3">
         {/* Date */}
         <div className="tracking-wide hidden sm:block font-serif italic">{mounted ? dateStr : ''}</div>

@@ -9,7 +9,7 @@ import {
   Merriweather,
   Playfair_Display,
 } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
+import { Analytics } from '@vercel/analytics/react'
 import Script from 'next/script'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
