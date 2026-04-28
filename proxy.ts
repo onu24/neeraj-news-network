@@ -8,7 +8,7 @@ import type { NextRequest } from 'next/server';
  * To re-enable, un-comment the redirect logic below.
  */
 
-export async function proxy(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   // Current state: AUTH DEACTIVATED for direct development access.
   // To re-enable, un-comment the redirect logic below.
   

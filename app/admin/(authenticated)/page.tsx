@@ -10,7 +10,8 @@ import {
   PenSquare, 
   FileEdit,
   Newspaper,
-  Info
+  Info,
+  Share2
 } from 'lucide-react';
 
 // Force dynamic or let Next.js cache depending on needs (Revalidating every hour fits CMS)
@@ -39,7 +40,7 @@ export default async function AdminDashboard() {
     {
       label: 'Published Articles',
       value: statsData.publishedCount,
-      trend: '+12% this month',
+      trend: statsData.growth.published > 0 ? `+${statsData.growth.published}% this month` : 'Updated just now',
       icon: FileText,
       color: 'text-blue-600',
       bg: 'bg-blue-100/50',
@@ -47,7 +48,7 @@ export default async function AdminDashboard() {
     {
       label: 'Total Views',
       value: statsData.totalViews.toLocaleString(),
-      trend: '+24% this month',
+      trend: 'Real-time sync',
       icon: Eye,
       color: 'text-emerald-600',
       bg: 'bg-emerald-100/50',
@@ -55,7 +56,7 @@ export default async function AdminDashboard() {
     {
       label: 'Featured Stories',
       value: statsData.featuredArticles,
-      trend: '4 Active',
+      trend: `${statsData.featuredArticles} Active`,
       icon: Star,
       color: 'text-amber-600',
       bg: 'bg-amber-100/50',
@@ -63,10 +64,18 @@ export default async function AdminDashboard() {
     {
       label: 'Active Categories',
       value: statsData.totalCategories,
-      trend: 'Covering 9 States',
+      trend: 'Live Database',
       icon: Tags,
       color: 'text-purple-600',
       bg: 'bg-purple-100/50',
+    },
+    {
+      label: 'Total Shares',
+      value: statsData.totalShares.toLocaleString(),
+      trend: 'Viral Engagement',
+      icon: Share2, // I need to import this if not already there
+      color: 'text-pink-600',
+      bg: 'bg-pink-100/50',
     },
   ];
 
@@ -108,7 +117,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* 2. KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
         {stats.map((stat) => (
           <div
             key={stat.label}
@@ -232,21 +241,21 @@ export default async function AdminDashboard() {
             <div className="space-y-5">
               <div>
                 <div className="flex justify-between text-sm mb-1.5">
-                  <span className="font-medium text-muted-foreground">Publishing Frequency</span>
-                  <span className="font-bold text-foreground">Good</span>
+                  <span className="font-medium text-muted-foreground">Publishing Health</span>
+                  <span className="font-bold text-foreground">{statsData.publishedCount > 0 ? 'Optimal' : 'Low'}</span>
                 </div>
                 <div className="w-full bg-secondary rounded-full h-2">
-                  <div className="bg-emerald-500 h-2 rounded-full w-4/5"></div>
+                  <div className={`h-2 rounded-full ${statsData.publishedCount > 10 ? 'bg-emerald-500 w-full' : 'bg-amber-500 w-1/2'}`}></div>
                 </div>
               </div>
               
               <div>
                 <div className="flex justify-between text-sm mb-1.5">
-                  <span className="font-medium text-muted-foreground">Category Coverage</span>
-                  <span className="font-bold text-foreground">75%</span>
+                  <span className="font-medium text-muted-foreground">Database Coverage</span>
+                  <span className="font-bold text-foreground">{statsData.totalCategories > 0 ? '100%' : '0%'}</span>
                 </div>
                 <div className="w-full bg-secondary rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full w-3/4"></div>
+                  <div className={`h-2 rounded-full bg-blue-500 ${statsData.totalCategories > 0 ? 'w-full' : 'w-0'}`}></div>
                 </div>
               </div>
             </div>
@@ -262,25 +271,22 @@ export default async function AdminDashboard() {
             
             {/* Display actual pending items from mock data */}
             <div className="space-y-4">
-               {statsData.draftCount + statsData.reviewCount === 0 ? (
+               {statsData.pendingArticles.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No pending items.</p>
                ) : (
-                 <div className="flex flex-col gap-4">
-                   <div className="flex items-start gap-3 pb-3 border-b border-border/50">
-                     <PenSquare className="mt-0.5 text-muted-foreground shrink-0" size={16} />
-                     <div>
-                       <p className="text-sm font-medium text-foreground leading-tight mb-1">Budget 2026 Expectations from Tech Sector</p>
-                       <p className="text-xs text-muted-foreground">Last edited 2 hours ago</p>
-                     </div>
-                   </div>
-                   <div className="flex items-start gap-3">
-                     <PenSquare className="mt-0.5 text-muted-foreground shrink-0" size={16} />
-                     <div>
-                       <p className="text-sm font-medium text-foreground leading-tight mb-1">Next Generation Launch Vehicle Preparations</p>
-                       <p className="text-xs text-muted-foreground">In Review by Editor</p>
-                     </div>
-                   </div>
-                 </div>
+                  <div className="flex flex-col gap-4">
+                    {statsData.pendingArticles.map((article: any) => (
+                      <div key={article.id} className="flex items-start gap-3 pb-3 border-b border-border/50 last:border-0 last:pb-0">
+                        <PenSquare className="mt-0.5 text-muted-foreground shrink-0" size={16} />
+                        <div>
+                          <p className="text-sm font-medium text-foreground leading-tight mb-1">{article.title}</p>
+                          <p className="text-xs text-muted-foreground uppercase tracking-tighter font-bold">
+                            {article.status === 'review' ? 'Under Review' : 'Draft'} • {formatAdminDate(article.updatedAt)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                )}
             </div>
             

@@ -10,6 +10,7 @@ export function Footer() {
   const { language, t } = useLanguage();
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [isSubscribing, setIsSubscribing] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -37,7 +38,7 @@ export function Footer() {
     { name: t('terms'), href: '/terms' },
   ];
 
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
     const email = newsletterEmail.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -55,17 +56,42 @@ export function Footer() {
       return;
     }
 
-    toast.success(t('subscribed_success'), {
-      description: `${t('subscribed_success')} ${email}.`,
-    });
-    setNewsletterEmail('');
+    setIsSubscribing(true);
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (data.message === 'Already subscribed') {
+          toast.info(language === 'hi' ? 'आप पहले से ही सब्सक्राइब कर चुके हैं!' : 'You are already subscribed!');
+        } else {
+          toast.success(t('subscribed_success'), {
+            description: `${t('subscribed_success')} ${email}.`,
+          });
+          setNewsletterEmail('');
+        }
+      } else {
+        throw new Error(data.error || 'Subscription failed');
+      }
+    } catch (error: any) {
+      toast.error(language === 'hi' ? 'कुछ गलत हो गया' : 'Something went wrong', {
+        description: error.message,
+      });
+    } finally {
+      setIsSubscribing(false);
+    }
   };
 
   return (
     <footer className="bg-zinc-950 text-white pt-16 pb-8 border-t-8 border-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
-          
+
           {/* Column 1: Brand & Mission */}
           <div className="space-y-6">
             <h2 className={`text-4xl tracking-tighter ${language === 'hi' ? 'font-hindi-serif font-black leading-tight' : 'font-serif font-black'}`}>
@@ -98,8 +124,8 @@ export function Footer() {
             <ul className="grid grid-cols-2 gap-y-4 gap-x-4">
               {categories.map((cat) => (
                 <li key={cat.slug}>
-                  <Link 
-                    href={cat.slug === 'visual-stories' ? '/visual-stories' : `/category/${cat.slug}`} 
+                  <Link
+                    href={cat.slug === 'visual-stories' ? '/visual-stories' : `/category/${cat.slug}`}
                     className={`text-zinc-400 hover:text-white transition-all duration-300 ease-premium hover:translate-x-1.5 inline-block ${language === 'hi' ? 'font-hindi-footer-link' : 'text-sm font-bold uppercase tracking-wider'}`}
                   >
                     {cat.name}
@@ -117,8 +143,8 @@ export function Footer() {
             <ul className="space-y-4">
               {network.map((item) => (
                 <li key={item.name}>
-                  <Link 
-                    href={item.href} 
+                  <Link
+                    href={item.href}
                     className={`text-zinc-400 hover:text-white transition-all duration-300 ease-premium hover:translate-x-1.5 inline-block ${language === 'hi' ? 'font-hindi-footer-link' : 'text-sm font-medium'}`}
                   >
                     {item.name}
@@ -137,25 +163,29 @@ export function Footer() {
               {mounted ? t('newsletter_intro') : TRANSLATIONS.hi.newsletter_intro}
             </p>
             <div className="flex flex-col gap-3">
-               <input 
-                 type="email" 
-                 placeholder={mounted ? t('email_placeholder') : TRANSLATIONS.hi.email_placeholder} 
-                 value={newsletterEmail}
-                 onChange={(e) => setNewsletterEmail(e.target.value)}
-                 suppressHydrationWarning
-                 className="bg-zinc-900 border border-zinc-800 px-4 py-3.5 text-sm focus:outline-none focus:border-primary transition-colors rounded-sm selection:bg-primary/20"
-               />
-               <button
-                 onClick={handleSubscribe}
-                 suppressHydrationWarning
-                 className={`group/sub relative w-full bg-primary py-4 text-white hover:bg-white hover:text-zinc-950 transition-all duration-500 overflow-hidden active:scale-95 shadow-xl ${language === 'hi' ? 'font-hindi-serif text-xl font-bold pt-3' : 'text-[11px] font-black uppercase tracking-[0.3em]'}`}
-               >
-                  <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover/sub:translate-x-full transition-transform duration-1000 ease-in-out" />
-                  <span className="relative z-10">{mounted ? t('subscribe_free') : TRANSLATIONS.hi.subscribe_free}</span>
-               </button>
+              <input
+                type="email"
+                placeholder={mounted ? t('email_placeholder') : TRANSLATIONS.hi.email_placeholder}
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                suppressHydrationWarning
+                disabled={isSubscribing}
+                className="bg-zinc-900 border border-zinc-800 px-4 py-3.5 text-sm focus:outline-none focus:border-primary transition-colors rounded-sm selection:bg-primary/20 disabled:opacity-50"
+              />
+              <button
+                onClick={handleSubscribe}
+                suppressHydrationWarning
+                disabled={isSubscribing}
+                className={`group/sub relative w-full bg-primary py-4 text-white hover:bg-white hover:text-zinc-950 transition-all duration-500 overflow-hidden active:scale-95 shadow-xl disabled:opacity-70 disabled:cursor-not-allowed ${language === 'hi' ? 'font-hindi-serif text-xl font-bold pt-3' : 'text-[11px] font-black uppercase tracking-[0.3em]'}`}
+              >
+                <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover/sub:translate-x-full transition-transform duration-1000 ease-in-out" />
+                <span className="relative z-10">
+                  {isSubscribing ? (language === 'hi' ? 'सब्सक्राइब हो रहा है...' : 'SUBSCRIBING...') : (mounted ? t('subscribe_free') : TRANSLATIONS.hi.subscribe_free)}
+                </span>
+              </button>
             </div>
             <p className={`text-[10px] text-zinc-500 leading-relaxed ${language === 'hi' ? 'font-hindi text-xs opacity-60' : 'uppercase tracking-widest'}`}>
-               {mounted ? t('agree_terms') : TRANSLATIONS.hi.agree_terms}
+              {mounted ? t('agree_terms') : TRANSLATIONS.hi.agree_terms}
             </p>
           </div>
 
@@ -167,7 +197,7 @@ export function Footer() {
             © {currentYear} {t('made_for_india')}
           </p>
           <div className={`flex items-center gap-8 text-zinc-500/80 ${language === 'hi' ? 'font-hindi-tiro text-sm font-medium' : 'text-[11px] font-bold uppercase tracking-widest'}`}>
-             <span>{language === 'hi' ? 'दृश्यम न्यूज नेटवर्क द्वारा भारत में गर्व से निर्मित' : 'PROUDLY MADE IN INDIA BY DRISHYAM NEWS NETWORK'}</span>
+            <span>{language === 'hi' ? 'दृश्यम न्यूज नेटवर्क द्वारा भारत में गर्व से निर्मित' : 'PROUDLY MADE IN INDIA BY DRISHYAM NEWS NETWORK'}</span>
           </div>
         </div>
       </div>

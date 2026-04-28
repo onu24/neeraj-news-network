@@ -6,10 +6,18 @@ import { useState } from 'react';
 interface ShareButtonsProps {
   title: string;
   url: string;
+  slug?: string;
 }
 
-export function ShareButtons({ title, url }: ShareButtonsProps) {
+export function ShareButtons({ title, url, slug }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
+
+  const trackShare = () => {
+    if (!slug) return;
+    fetch(`/api/articles/${encodeURIComponent(slug)}/share`, {
+      method: 'POST',
+    }).catch(err => console.error('[ShareTracker] Failed:', err));
+  };
 
   const siteOrigin =
     process.env.NEXT_PUBLIC_SITE_URL ||
@@ -19,6 +27,7 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
   const handleCopy = () => {
     navigator.clipboard.writeText(fullUrl);
     setCopied(true);
+    trackShare();
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -59,6 +68,8 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={trackShare}
+            suppressHydrationWarning
             className={`flex items-center gap-2 px-4 py-2 rounded-full border border-border text-sm font-medium transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:shadow-md active:scale-95 ${link.color}`}
           >
             {link.icon}

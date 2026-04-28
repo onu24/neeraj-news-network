@@ -74,6 +74,7 @@ export function toArticle(id: string, data: Record<string, any>): NewsArticle {
     tags: data.tags || [],
     articleType: data.articleType || 'standard',
     views: data.views || 0,
+    shares: data.shares || 0,
     readingTime: data.readingTime || 3,
     language: data.language || 'en',
     createdAt: parseDate(data.createdAt),

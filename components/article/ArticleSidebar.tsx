@@ -14,9 +14,10 @@ interface ArticleSidebarProps {
   trendingArticles: Article[];
   articleTitle: string;
   articleUrl: string;
+  articleSlug: string;
 }
 
-export function ArticleSidebar({ relatedArticles, trendingArticles, articleTitle, articleUrl }: ArticleSidebarProps) {
+export function ArticleSidebar({ relatedArticles, trendingArticles, articleTitle, articleUrl, articleSlug }: ArticleSidebarProps) {
   const { language, t } = useLanguage();
 
   return (
@@ -89,7 +90,7 @@ export function ArticleSidebar({ relatedArticles, trendingArticles, articleTitle
       {/* Social Share Column */}
       <ScrollReveal delay={400}>
         <div className="bg-zinc-50 p-6 rounded-sm border border-zinc-200">
-          <SocialShareSide title={articleTitle} url={articleUrl} />
+          <SocialShareSide title={articleTitle} url={articleUrl} slug={articleSlug} />
         </div>
       </ScrollReveal>
     </aside>

@@ -8,11 +8,27 @@ export function SidebarNewsletter() {
   const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      setIsSubscribed(true);
+    if (!email) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        setIsSubscribed(true);
+      }
+    } catch (err) {
+      console.error('[Newsletter] Submit error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -43,13 +59,17 @@ export function SidebarNewsletter() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border rounded-sm bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
+              suppressHydrationWarning
+              disabled={isLoading}
+              className="w-full px-4 py-2 border rounded-sm bg-background/50 focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm disabled:opacity-50"
             />
             <button
               type="submit"
-              className="w-full bg-foreground text-background font-bold text-[10px] uppercase tracking-widest py-3 rounded-sm hover:-translate-y-0.5 transition-all shadow-md active:translate-y-0"
+              suppressHydrationWarning
+              disabled={isLoading}
+              className="w-full bg-foreground text-background font-bold text-[10px] uppercase tracking-widest py-3 rounded-sm hover:-translate-y-0.5 transition-all shadow-md active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Join the Editorial Feed
+              {isLoading ? 'Joining...' : 'Join the Editorial Feed'}
             </button>
           </form>
         )}

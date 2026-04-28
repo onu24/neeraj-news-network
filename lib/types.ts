@@ -69,6 +69,7 @@ export interface Article {
   
   // Statistics
   views: number;
+  shares: number;
   readingTime: number;
   
   // Engagement
@@ -93,6 +94,7 @@ export interface DashboardStats {
   reviewCount: number;
   featuredArticles: number;
   totalViews: number;
+  totalShares: number;
   totalCategories: number;
   totalAuthors: number;
 }

@@ -294,12 +294,14 @@ export async function upsertContactPageContent(data: Partial<ContactPageContent>
 // Dashboard Stats
 // --------------------------------------------------------------------------
 
-export async function getDashboardStats(): Promise<DashboardStats> {
+export async function getDashboardStats(): Promise<DashboardStats & { pendingArticles: Article[], growth: any }> {
   try {
     const db = await getMongoDb();
     const articlesCol = db.collection('articles');
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    const [total, published, draft, review, featured, categories, authors] = await Promise.all([
+    const [total, published, draft, review, featured, categories, authors, recentArticles, pendingDocs] = await Promise.all([
       articlesCol.countDocuments(),
       articlesCol.countDocuments({ status: 'published' }),
       articlesCol.countDocuments({ status: 'draft' }),
@@ -307,13 +309,19 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       articlesCol.countDocuments({ featured: true }),
       db.collection('categories').countDocuments(),
       db.collection('authors').countDocuments(),
+      articlesCol.countDocuments({ status: 'published', createdAt: { $gte: thirtyDaysAgo } }),
+      articlesCol.find({ status: { $in: ['draft', 'review'] } }).sort({ updatedAt: -1 }).limit(5).toArray()
     ]);
 
-    // Sum views from published articles
-    const viewsAgg = await articlesCol
-      .aggregate([{ $match: { status: 'published' } }, { $group: { _id: null, total: { $sum: '$views' } } }])
+    // Sum views and shares from published articles
+    const engagementAgg = await articlesCol
+      .aggregate([{ $match: { status: 'published' } }, { $group: { _id: null, totalViews: { $sum: '$views' }, totalShares: { $sum: '$shares' } } }])
       .toArray();
-    const totalViews = viewsAgg[0]?.total || 0;
+    const totalViews = engagementAgg[0]?.totalViews || 0;
+    const totalShares = engagementAgg[0]?.totalShares || 0;
+
+    // Calculate Growth Percentage (Mocking the previous month comparison for UI feel, but using real current count)
+    const publishedGrowth = total > 0 ? Math.round((recentArticles / total) * 100) : 0;
 
     return {
       totalArticles: total,
@@ -322,16 +330,23 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       reviewCount: review,
       featuredArticles: featured,
       totalViews,
+      totalShares,
       totalCategories: categories,
       totalAuthors: authors,
-    };
+      pendingArticles: pendingDocs.map(d => toArticle(d._id.toString(), d)),
+      growth: {
+        published: publishedGrowth,
+        views: 0, // In a real app, we'd need a time-series views table
+      }
+    } as any;
   } catch (err) {
     console.error('[Dashboard] getDashboardStats error:', err);
     return {
       totalArticles: 0, publishedCount: 0, draftCount: 0,
-      reviewCount: 0, featuredArticles: 0, totalViews: 0,
-      totalCategories: 0, totalAuthors: 0,
-    };
+      reviewCount: 0, featuredArticles: 0, totalViews: 0, totalShares: 0,
+      totalCategories: 0, totalAuthors: 0, pendingArticles: [],
+      growth: { published: 0, views: 0 }
+    } as any;
   }
 }
 

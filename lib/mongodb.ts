@@ -59,6 +59,7 @@ async function ensureIndexes(db: Db) {
       const articles = db.collection('articles');
       const categories = db.collection('categories');
       const visualStories = db.collection('visualStories');
+      const users = db.collection('users');
 
       await Promise.all([
         safeCreateIndex(articles, { slug: 1 }, { name: 'slug_unique', unique: true }),
@@ -85,6 +86,7 @@ async function ensureIndexes(db: Db) {
         safeCreateIndex(categories, { order: 1, name: 1 }, { name: 'order_name' }),
         safeCreateIndex(visualStories, { slug: 1 }, { name: 'slug_unique', unique: true }),
         safeCreateIndex(visualStories, { createdAt: -1 }, { name: 'createdAt_desc' }),
+        safeCreateIndex(users, { email: 1 }, { name: 'email_unique', unique: true }),
       ]);
     })().catch((error) => {
       global.__drishyamMongoIndexesPromise = undefined;

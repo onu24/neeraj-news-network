@@ -9,6 +9,7 @@ import { ArticleImageGallery } from '@/components/article/ArticleImageGallery';
 import { ReadingProgress } from '@/components/article/ReadingProgress';
 import { TableOfContents } from '@/components/article/TableOfContents';
 import { RelatedEngagement } from '@/components/article/RelatedEngagement';
+import { ViewTracker } from '@/components/article/ViewTracker';
 import { 
   getArticleBySlug, 
   getAuthorById, 
@@ -124,6 +125,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   return (
     <main className="flex flex-col min-h-screen bg-white">
+      <ViewTracker slug={slug} />
       <ReadingProgress />
       {/* Structured Data for SEO */}
       <Script
@@ -194,6 +196,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 trendingArticles={trendingArticles}
                 articleTitle={displayTitle}
                 articleUrl={`/article/${slug}`}
+                articleSlug={slug}
               />
             </div>
 

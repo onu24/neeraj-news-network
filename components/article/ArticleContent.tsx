@@ -5,7 +5,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { ArticleContentFont } from '@/lib/types';
 import { useLanguage } from '@/components/providers/LanguageProvider';
 import { Reveal } from '@/components/animations/Reveal';
-import { InlineEngagement } from './InlineEngagement';
+import { AdContainer } from '../AdContainer';
 import Link from 'next/link';
 
 interface ArticleContentProps {
@@ -97,7 +97,7 @@ export function ArticleContent({ content, content_hi, keyPoints, articleType, co
             );
           }
 
-  // Regular paragraph with internal linking
+          // Regular paragraph with internal linking
           const linkifyKeywords = (text: string) => {
             const keywords = [
               { word: 'India', slug: '/category/india' },
@@ -124,20 +124,12 @@ export function ArticleContent({ content, content_hi, keyPoints, articleType, co
                 />
               </Reveal>
 
-              {/* Inject Inline Engagement Blocks */}
+              {/* Inject AdSense Containers */}
               {index === 1 && (
-                <InlineEngagement 
-                  type="explainer" 
-                  title="Explainer: Understanding the broader context of this development" 
-                  slug="understanding-the-broader-context" 
-                />
+                <AdContainer slot="article_inline_top" format="rectangle" />
               )}
               {index === 4 && (
-                <InlineEngagement 
-                  type="visual-story" 
-                  title="Visual Story: See the full timeline through photos" 
-                  slug="full-timeline-visual" 
-                />
+                <AdContainer slot="article_inline_bottom" format="auto" />
               )}
             </React.Fragment>
           );

@@ -74,6 +74,16 @@ export function TopBar() {
             </button>
           </div>
 
+          {/* Auth Links */}
+          <div className="flex items-center gap-4 border-l border-border/40 pl-4">
+            <a 
+              href="/admin/login" 
+              className="hover:text-primary transition-colors font-bold uppercase tracking-widest text-[9px] sm:text-[10px]"
+            >
+              Admin Portal
+            </a>
+          </div>
+
           {/* Theme Toggle */}
           <div className="relative h-8 w-8">
             <AnimatePresence mode="wait" initial={false}>

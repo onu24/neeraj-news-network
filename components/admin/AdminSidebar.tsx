@@ -16,7 +16,8 @@ import {
   Settings,
   Info,
   Phone,
-  LogOut
+  LogOut,
+  UserPlus
 } from 'lucide-react';
 import { logout } from '@/lib/actions/auth-actions';
 import { useRouter } from 'next/navigation';
@@ -57,6 +58,12 @@ export function AdminSidebar() {
         { href: '/admin/about', label: 'About Page', icon: Info },
         { href: '/admin/contact', label: 'Contact Page', icon: Phone },
         { href: '/admin/categories', label: 'Settings', icon: Settings },
+      ]
+    },
+    {
+      title: 'System',
+      items: [
+        { href: '/admin/create-user', label: 'Create Admin', icon: UserPlus },
       ]
     }
   ];
