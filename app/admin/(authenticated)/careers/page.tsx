@@ -54,55 +54,87 @@ export default async function AdminCareersPage() {
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-secondary/30 border-b border-border text-xs uppercase tracking-widest text-muted-foreground">
-                <tr>
-                  <th className="py-4 px-6 font-semibold">Job Title</th>
-                  <th className="py-4 px-6 font-semibold">Location / Type</th>
-                  <th className="py-4 px-6 font-semibold">Status</th>
-                  <th className="py-4 px-6 font-semibold">Posted On</th>
-                  <th className="py-4 px-6 font-semibold text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {jobs.map((job) => (
-                  <tr key={job.id} className="hover:bg-secondary/20 transition-colors group">
-                    <td className="py-4 px-6">
-                      <div className="font-medium text-foreground">{job.title}</div>
-                      <div className="text-xs text-muted-foreground">{job.slug}</div>
-                    </td>
-                    <td className="py-4 px-6 text-muted-foreground">
-                      {job.location} • {job.type}
-                    </td>
-                    <td className="py-4 px-6">
-                      {job.isActive ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded-sm text-xs font-bold bg-emerald-100 text-emerald-800">
-                          Active
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2 py-1 rounded-sm text-xs font-bold bg-secondary/80 text-foreground">
-                          Closed
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-4 px-6 text-muted-foreground whitespace-nowrap">
-                      {new Date(job.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      {/* Using Link for edit. To keep simple, we can just use create page with edit logic or separate component */}
-                      <Link 
-                        href={`/admin/careers/${job.id}`}
-                        className="text-primary hover:underline text-sm font-semibold"
-                      >
-                        Edit
-                      </Link>
-                    </td>
+          <>
+            {/* Desktop View - Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-secondary/30 border-b border-border text-xs uppercase tracking-widest text-muted-foreground">
+                  <tr>
+                    <th className="py-4 px-6 font-semibold">Job Title</th>
+                    <th className="py-4 px-6 font-semibold">Location / Type</th>
+                    <th className="py-4 px-6 font-semibold">Status</th>
+                    <th className="py-4 px-6 font-semibold text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {jobs.map((job) => (
+                    <tr key={job.id} className="hover:bg-secondary/20 transition-colors group">
+                      <td className="py-4 px-6">
+                        <div className="font-medium text-foreground">{job.title}</div>
+                        <div className="text-xs text-muted-foreground">{job.slug}</div>
+                      </td>
+                      <td className="py-4 px-6 text-muted-foreground">
+                        {job.location} • {job.type}
+                      </td>
+                      <td className="py-4 px-6">
+                        {job.isActive ? (
+                          <span className="inline-flex items-center px-2 py-1 rounded-sm text-xs font-bold bg-emerald-100 text-emerald-800">
+                            Active
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-1 rounded-sm text-xs font-bold bg-secondary/80 text-foreground">
+                            Closed
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <Link 
+                          href={`/admin/careers/${job.id}`}
+                          className="text-primary hover:underline text-sm font-semibold"
+                        >
+                          Edit
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile View - Cards */}
+            <div className="md:hidden divide-y divide-border/50">
+              {jobs.map((job) => (
+                <div key={job.id} className="p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-bold text-foreground">{job.title}</h3>
+                      <p className="text-xs text-muted-foreground">{job.location} • {job.type}</p>
+                    </div>
+                    {job.isActive ? (
+                      <span className="px-2 py-0.5 rounded-sm text-[10px] font-black uppercase bg-emerald-100 text-emerald-800">
+                        Active
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-sm text-[10px] font-black uppercase bg-secondary text-muted-foreground">
+                        Closed
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-tighter">
+                      Posted: {new Date(job.createdAt).toLocaleDateString()}
+                    </span>
+                    <Link 
+                      href={`/admin/careers/${job.id}`}
+                      className="px-3 py-1.5 bg-primary/10 text-primary text-xs font-bold rounded-sm uppercase tracking-widest"
+                    >
+                      Edit Role
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

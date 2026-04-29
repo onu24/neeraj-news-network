@@ -47,65 +47,110 @@ export default async function AdminApplicationsPage({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-secondary/30 border-b border-border text-xs uppercase tracking-widest text-muted-foreground">
-                <tr>
-                  <th className="py-4 px-6 font-semibold">Candidate</th>
-                  <th className="py-4 px-6 font-semibold">Applied For</th>
-                  <th className="py-4 px-6 font-semibold">Contact</th>
-                  <th className="py-4 px-6 font-semibold">Date</th>
-                  <th className="py-4 px-6 font-semibold text-right">Resume</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {applications.map((app) => (
-                  <tr key={app.id} className="hover:bg-secondary/20 transition-colors group">
-                    <td className="py-4 px-6">
-                      <div className="font-bold text-foreground">{app.applicantName}</div>
-                      {app.coverLetter && (
-                         <div className="text-xs text-muted-foreground mt-1 line-clamp-2 max-w-xs" title={app.coverLetter}>
-                           {app.coverLetter}
-                         </div>
-                      )}
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="font-medium text-foreground">{app.jobTitle}</div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex flex-col gap-1">
-                        <a href={`mailto:${app.applicantEmail}`} className="text-muted-foreground hover:text-primary flex items-center gap-1.5">
-                          <Mail size={12} /> {app.applicantEmail}
-                        </a>
-                        {app.applicantPhone && (
-                          <a href={`tel:${app.applicantPhone}`} className="text-muted-foreground hover:text-primary flex items-center gap-1.5">
-                            <Phone size={12} /> {app.applicantPhone}
-                          </a>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-4 px-6 text-muted-foreground whitespace-nowrap">
-                      {new Date(app.createdAt).toLocaleString()}
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      {app.resumeUrl ? (
-                         <a 
-                          href={app.resumeUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-md transition-colors text-xs font-bold uppercase"
-                        >
-                          View PDF <ExternalLink size={14} />
-                        </a>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">No Resume</span>
-                      )}
-                    </td>
+          <>
+            {/* Desktop View - Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-secondary/30 border-b border-border text-xs uppercase tracking-widest text-muted-foreground">
+                  <tr>
+                    <th className="py-4 px-6 font-semibold">Candidate</th>
+                    <th className="py-4 px-6 font-semibold">Applied For</th>
+                    <th className="py-4 px-6 font-semibold">Contact</th>
+                    <th className="py-4 px-6 font-semibold">Date</th>
+                    <th className="py-4 px-6 font-semibold text-right">Resume</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {applications.map((app) => (
+                    <tr key={app.id} className="hover:bg-secondary/20 transition-colors group">
+                      <td className="py-4 px-6">
+                        <div className="font-bold text-foreground">{app.applicantName}</div>
+                        {app.coverLetter && (
+                           <div className="text-xs text-muted-foreground mt-1 line-clamp-2 max-w-xs" title={app.coverLetter}>
+                             {app.coverLetter}
+                           </div>
+                        )}
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="font-medium text-foreground">{app.jobTitle}</div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex flex-col gap-1">
+                          <a href={`mailto:${app.applicantEmail}`} className="text-muted-foreground hover:text-primary flex items-center gap-1.5">
+                            <Mail size={12} /> {app.applicantEmail}
+                          </a>
+                          {app.applicantPhone && (
+                            <a href={`tel:${app.applicantPhone}`} className="text-muted-foreground hover:text-primary flex items-center gap-1.5">
+                              <Phone size={12} /> {app.applicantPhone}
+                            </a>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 text-muted-foreground whitespace-nowrap">
+                        {new Date(app.createdAt).toLocaleString()}
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        {app.resumeUrl ? (
+                           <a 
+                            href={app.resumeUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-md transition-colors text-xs font-bold uppercase"
+                          >
+                            View PDF <ExternalLink size={14} />
+                          </a>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">No Resume</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile View - Cards */}
+            <div className="md:hidden divide-y divide-border/50">
+              {applications.map((app) => (
+                <div key={app.id} className="p-4 space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-bold text-foreground">{app.applicantName}</h3>
+                      <p className="text-xs font-medium text-primary mt-0.5">{app.jobTitle}</p>
+                    </div>
+                    {app.resumeUrl ? (
+                      <a 
+                        href={app.resumeUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="p-2 bg-primary/10 text-primary rounded-full"
+                      >
+                        <ExternalLink size={16} />
+                      </a>
+                    ) : (
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold">No PDF</span>
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-2 text-xs">
+                    <a href={`mailto:${app.applicantEmail}`} className="flex items-center gap-2 text-muted-foreground bg-secondary/30 p-2 rounded-sm">
+                      <Mail size={14} /> {app.applicantEmail}
+                    </a>
+                    {app.applicantPhone && (
+                      <a href={`tel:${app.applicantPhone}`} className="flex items-center gap-2 text-muted-foreground bg-secondary/30 p-2 rounded-sm">
+                        <Phone size={14} /> {app.applicantPhone}
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="flex justify-between items-center text-[10px] text-muted-foreground uppercase tracking-widest pt-1">
+                    <span>{new Date(app.createdAt).toLocaleDateString()}</span>
+                    <span>{new Date(app.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>
