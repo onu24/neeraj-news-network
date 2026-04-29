@@ -27,6 +27,8 @@ export function NotificationBell() {
   const [isPushSupported, setIsPushSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
 
   const fetchNotifications = async () => {
     try {
@@ -49,6 +51,14 @@ export function NotificationBell() {
   };
 
   const checkPushSubscription = async () => {
+    // Detect iOS and Standalone mode
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const iOS = /iphone|ipad|ipod/.test(userAgent);
+    setIsIOS(iOS);
+    
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || ('standalone' in window.navigator && (window.navigator as any).standalone === true);
+    setIsStandalone(standalone);
+
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       setIsPushSupported(true);
       const registration = await navigator.serviceWorker.ready;
@@ -187,23 +197,34 @@ export function NotificationBell() {
                 </span>
               </div>
               
-              {isPushSupported && (
-                <div className="flex items-center justify-between bg-background/50 p-2.5 rounded-xl border border-border/50">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-tighter">Desktop Notifications</span>
-                    <span className="text-[9px] text-muted-foreground">Get background alerts</span>
+              {(isPushSupported || (isIOS && !isStandalone)) && (
+                <div className="flex flex-col gap-2 bg-background/50 p-2.5 rounded-xl border border-border/50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black uppercase tracking-tighter">Push Notifications</span>
+                      <span className="text-[9px] text-muted-foreground">Get lock screen alerts</span>
+                    </div>
+                    {isPushSupported ? (
+                      <button
+                        onClick={isSubscribed ? unsubscribeFromPush : subscribeToPush}
+                        disabled={isSubscribing}
+                        className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${
+                          isSubscribed 
+                            ? 'bg-green-100 text-green-700 hover:bg-red-50 hover:text-red-600' 
+                            : 'bg-primary text-white hover:bg-primary/90'
+                        } disabled:opacity-50`}
+                      >
+                        {isSubscribing ? '...' : (isSubscribed ? 'Enabled' : 'Enable')}
+                      </button>
+                    ) : (
+                      <span className="px-2 py-1 rounded bg-orange-100 text-orange-700 text-[9px] font-black uppercase">Action Needed</span>
+                    )}
                   </div>
-                  <button
-                    onClick={isSubscribed ? unsubscribeFromPush : subscribeToPush}
-                    disabled={isSubscribing}
-                    className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${
-                      isSubscribed 
-                        ? 'bg-green-100 text-green-700 hover:bg-red-50 hover:text-red-600' 
-                        : 'bg-primary text-white hover:bg-primary/90'
-                    } disabled:opacity-50`}
-                  >
-                    {isSubscribing ? '...' : (isSubscribed ? 'Enabled' : 'Enable')}
-                  </button>
+                  {isIOS && !isStandalone && (
+                    <div className="mt-1 p-2 rounded-lg bg-secondary/50 text-[10px] leading-tight text-foreground/80 border border-border/50">
+                      <strong>iOS User:</strong> To enable lock screen notifications, tap the <strong className="text-primary">Share</strong> button at the bottom of Safari and select <strong className="text-primary">Add to Home Screen</strong>.
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -223,6 +244,7 @@ export function NotificationBell() {
                           src={article.coverImage}
                           alt=""
                           fill
+                          sizes="64px"
                           className="object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                       )}

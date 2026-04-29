@@ -61,7 +61,7 @@ export function SocialShareSide({ title, url, slug }: SocialShareSideProps) {
         </h3>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
+      <div className="flex overflow-x-auto lg:grid lg:grid-cols-1 gap-3 pb-4 lg:pb-0 snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] -mx-4 px-4 lg:mx-0 lg:px-0">
         {/* WhatsApp - THE PRIMARY ACTION */}
         <a
           href={shareLinks.whatsapp}
@@ -69,13 +69,13 @@ export function SocialShareSide({ title, url, slug }: SocialShareSideProps) {
           rel="noopener noreferrer"
           onClick={trackShare}
           suppressHydrationWarning
-          className="group relative flex items-center gap-4 px-5 py-4 bg-[#25D366] text-white rounded-2xl overflow-hidden shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:-translate-y-1 active:scale-95 transition-all duration-500"
+          className="shrink-0 snap-start min-w-[130px] lg:min-w-0 group relative flex items-center gap-2.5 lg:gap-4 px-3 py-2.5 lg:px-5 lg:py-4 bg-[#25D366] text-white rounded-lg lg:rounded-2xl overflow-hidden shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:-translate-y-1 active:scale-95 transition-all duration-500"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <WhatsAppIcon className="h-6 w-6 relative z-10 drop-shadow-md" />
+          <WhatsAppIcon className="h-4 w-4 lg:h-6 lg:w-6 relative z-10 drop-shadow-md" />
           <div className="flex flex-col relative z-10">
-            <span className="text-[10px] font-black uppercase tracking-widest opacity-80 leading-none mb-1">Send to</span>
-            <span className="text-sm font-bold tracking-tight leading-none">WhatsApp</span>
+            <span className="text-[8px] lg:text-[10px] font-black uppercase tracking-widest opacity-80 leading-none mb-1">Send to</span>
+            <span className="text-[11px] lg:text-sm font-bold tracking-tight leading-none">WhatsApp</span>
           </div>
         </a>
 
@@ -86,13 +86,13 @@ export function SocialShareSide({ title, url, slug }: SocialShareSideProps) {
           rel="noopener noreferrer"
           onClick={trackShare}
           suppressHydrationWarning
-          className="group relative flex items-center gap-4 px-5 py-4 bg-[#1877F2] text-white rounded-2xl overflow-hidden shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-1 active:scale-95 transition-all duration-500"
+          className="shrink-0 snap-start min-w-[130px] lg:min-w-0 group relative flex items-center gap-2.5 lg:gap-4 px-3 py-2.5 lg:px-5 lg:py-4 bg-[#1877F2] text-white rounded-lg lg:rounded-2xl overflow-hidden shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-1 active:scale-95 transition-all duration-500"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <Facebook className="h-6 w-6 relative z-10 drop-shadow-md" />
+          <Facebook className="h-4 w-4 lg:h-6 lg:w-6 relative z-10 drop-shadow-md" />
           <div className="flex flex-col relative z-10">
-             <span className="text-[10px] font-black uppercase tracking-widest opacity-80 leading-none mb-1">Post on</span>
-             <span className="text-sm font-bold tracking-tight leading-none">Facebook</span>
+             <span className="text-[8px] lg:text-[10px] font-black uppercase tracking-widest opacity-80 leading-none mb-1">Post on</span>
+             <span className="text-[11px] lg:text-sm font-bold tracking-tight leading-none">Facebook</span>
           </div>
         </a>
 
@@ -103,13 +103,13 @@ export function SocialShareSide({ title, url, slug }: SocialShareSideProps) {
           rel="noopener noreferrer"
           onClick={trackShare}
           suppressHydrationWarning
-          className="group relative flex items-center gap-4 px-5 py-4 bg-[#0088cc] text-white rounded-2xl overflow-hidden shadow-lg shadow-sky-500/20 hover:shadow-sky-500/40 hover:-translate-y-1 active:scale-95 transition-all duration-500"
+          className="shrink-0 snap-start min-w-[130px] lg:min-w-0 group relative flex items-center gap-2.5 lg:gap-4 px-3 py-2.5 lg:px-5 lg:py-4 bg-[#0088cc] text-white rounded-lg lg:rounded-2xl overflow-hidden shadow-lg shadow-sky-500/20 hover:shadow-sky-500/40 hover:-translate-y-1 active:scale-95 transition-all duration-500"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <Send className="h-6 w-6 relative z-10 drop-shadow-md" />
+          <Send className="h-4 w-4 lg:h-6 lg:w-6 relative z-10 drop-shadow-md" />
           <div className="flex flex-col relative z-10">
-             <span className="text-[10px] font-black uppercase tracking-widest opacity-80 leading-none mb-1">Forward to</span>
-             <span className="text-sm font-bold tracking-tight leading-none">Telegram</span>
+             <span className="text-[8px] lg:text-[10px] font-black uppercase tracking-widest opacity-80 leading-none mb-1">Forward to</span>
+             <span className="text-[11px] lg:text-sm font-bold tracking-tight leading-none">Telegram</span>
           </div>
         </a>
 
@@ -120,13 +120,13 @@ export function SocialShareSide({ title, url, slug }: SocialShareSideProps) {
           rel="noopener noreferrer"
           onClick={trackShare}
           suppressHydrationWarning
-          className="group relative flex items-center gap-4 px-5 py-4 bg-zinc-950 text-white rounded-2xl overflow-hidden shadow-lg shadow-black/20 hover:shadow-black/40 hover:-translate-y-1 active:scale-95 transition-all duration-500 border border-white/10"
+          className="shrink-0 snap-start min-w-[130px] lg:min-w-0 group relative flex items-center gap-2.5 lg:gap-4 px-3 py-2.5 lg:px-5 lg:py-4 bg-zinc-950 text-white rounded-lg lg:rounded-2xl overflow-hidden shadow-lg shadow-black/20 hover:shadow-black/40 hover:-translate-y-1 active:scale-95 transition-all duration-500 border border-white/10"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <Twitter className="h-6 w-6 relative z-10 drop-shadow-md" />
+          <Twitter className="h-4 w-4 lg:h-6 lg:w-6 relative z-10 drop-shadow-md" />
           <div className="flex flex-col relative z-10">
-             <span className="text-[10px] font-black uppercase tracking-widest opacity-80 leading-none mb-1">Tweet on</span>
-             <span className="text-sm font-bold tracking-tight leading-none">X / Twitter</span>
+             <span className="text-[8px] lg:text-[10px] font-black uppercase tracking-widest opacity-80 leading-none mb-1">Tweet on</span>
+             <span className="text-[11px] lg:text-sm font-bold tracking-tight leading-none">X / Twitter</span>
           </div>
         </a>
 
@@ -134,20 +134,20 @@ export function SocialShareSide({ title, url, slug }: SocialShareSideProps) {
         <button
           onClick={copyToClipboard}
           suppressHydrationWarning
-          className={`group relative flex items-center gap-4 px-5 py-4 rounded-2xl border transition-all duration-500 hover:-translate-y-1 active:scale-95 overflow-hidden ${
+          className={`shrink-0 snap-start min-w-[130px] lg:min-w-0 group relative flex items-center gap-2.5 lg:gap-4 px-3 py-2.5 lg:px-5 lg:py-4 rounded-lg lg:rounded-2xl border transition-all duration-500 hover:-translate-y-1 active:scale-95 overflow-hidden ${
             copied 
             ? 'bg-emerald-50 border-emerald-200 text-emerald-600 shadow-xl shadow-emerald-500/20' 
             : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-sm hover:shadow-xl hover:border-primary/20'
           }`}
         >
           {copied ? (
-            <Check className="h-6 w-6 animate-in zoom-in duration-300 relative z-10" />
+            <Check className="h-4 w-4 lg:h-6 lg:w-6 animate-in zoom-in duration-300 relative z-10" />
           ) : (
-            <Link2 className="h-6 w-6 group-hover:rotate-45 transition-transform duration-500 relative z-10" />
+            <Link2 className="h-4 w-4 lg:h-6 lg:w-6 group-hover:rotate-45 transition-transform duration-500 relative z-10" />
           )}
           <div className="flex flex-col text-left relative z-10">
-             <span className="text-[10px] font-black uppercase tracking-widest opacity-60 leading-none mb-1">Direct Link</span>
-             <span className="text-sm font-bold tracking-tight leading-none">
+             <span className="text-[8px] lg:text-[10px] font-black uppercase tracking-widest opacity-60 leading-none mb-1">Direct Link</span>
+             <span className="text-[11px] lg:text-sm font-bold tracking-tight leading-none">
                 {copied ? 'Link Copied!' : 'Copy to Clipboard'}
              </span>
           </div>

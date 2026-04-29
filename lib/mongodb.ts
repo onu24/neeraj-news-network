@@ -60,6 +60,8 @@ async function ensureIndexes(db: Db) {
       const categories = db.collection('categories');
       const visualStories = db.collection('visualStories');
       const users = db.collection('users');
+      const jobOpenings = db.collection('jobOpenings');
+      const jobApplications = db.collection('jobApplications');
 
       await Promise.all([
         safeCreateIndex(articles, { slug: 1 }, { name: 'slug_unique', unique: true }),
@@ -87,6 +89,9 @@ async function ensureIndexes(db: Db) {
         safeCreateIndex(visualStories, { slug: 1 }, { name: 'slug_unique', unique: true }),
         safeCreateIndex(visualStories, { createdAt: -1 }, { name: 'createdAt_desc' }),
         safeCreateIndex(users, { email: 1 }, { name: 'email_unique', unique: true }),
+        safeCreateIndex(jobOpenings, { isActive: 1, createdAt: -1 }, { name: 'active_createdAt' }),
+        safeCreateIndex(jobOpenings, { slug: 1 }, { name: 'slug_unique', unique: true }),
+        safeCreateIndex(jobApplications, { jobId: 1, createdAt: -1 }, { name: 'jobId_createdAt' }),
       ]);
     })().catch((error) => {
       global.__drishyamMongoIndexesPromise = undefined;

@@ -7,6 +7,7 @@ import { Clock, Eye, Calendar } from 'lucide-react';
 import { ScrollReveal } from '@/components/ScrollReveal';
 import { useLanguage } from '@/components/providers/LanguageProvider';
 import { useState } from 'react';
+import { SocialShareSide } from '@/components/article/SocialShareSide';
 
 /** Handles broken avatar URLs from Firestore with a local fallback */
 function AvatarImage({ src, alt }: { src: string; alt: string }) {
@@ -58,7 +59,7 @@ export function ArticleHeader({ article, author }: ArticleHeaderProps) {
       {/* Hero Featured Image - NOW AT TOP */}
       {article.coverImage && (
         <ScrollReveal delay={100} baseClass="reveal-blur">
-          <div className="mb-10 group">
+          <div className="mb-6 lg:mb-10 group">
             <div className="relative w-full aspect-video overflow-hidden rounded-sm shadow-2xl border border-zinc-200">
               <Image
                 src={article.coverImage}
@@ -77,6 +78,11 @@ export function ArticleHeader({ article, author }: ArticleHeaderProps) {
           </div>
         </ScrollReveal>
       )}
+
+      {/* Mobile Share Buttons - Below Image */}
+      <div className="block lg:hidden mb-8 -mt-2">
+        <SocialShareSide title={displayTitle} url={`/article/${article.slug}`} slug={article.slug} />
+      </div>
 
       <ScrollReveal delay={200}>
         <div className="space-y-8">

@@ -163,6 +163,7 @@ export function SearchInput() {
                                   src={article.coverImage} 
                                   alt="" 
                                   fill 
+                                  sizes="48px"
                                   className="object-cover group-hover:scale-110 transition-transform duration-500" 
                                 />
                               )}

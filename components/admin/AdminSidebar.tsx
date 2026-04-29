@@ -17,12 +17,14 @@ import {
   Info,
   Phone,
   LogOut,
-  UserPlus
+  UserPlus,
+  BriefcaseBusiness,
+  FileUser
 } from 'lucide-react';
 import { logout } from '@/lib/actions/auth-actions';
 import { useRouter } from 'next/navigation';
 
-export function AdminSidebar() {
+export function AdminSidebar({ userRole = 'admin' }: { userRole?: string }) {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -40,7 +42,7 @@ export function AdminSidebar() {
     return pathname.startsWith(path);
   };
 
-  const menuGroups = [
+  const allMenuGroups = [
     {
       title: 'Editorial',
       items: [
@@ -57,6 +59,8 @@ export function AdminSidebar() {
         { href: '/admin/authors', label: 'Authors', icon: Users },
         { href: '/admin/about', label: 'About Page', icon: Info },
         { href: '/admin/contact', label: 'Contact Page', icon: Phone },
+        { href: '/admin/careers', label: 'Careers', icon: BriefcaseBusiness },
+        { href: '/admin/careers/applications', label: 'Applications', icon: FileUser },
         { href: '/admin/categories', label: 'Settings', icon: Settings },
       ]
     },
@@ -68,6 +72,16 @@ export function AdminSidebar() {
       ]
     }
   ];
+
+  // Filter out groups based on role
+  const menuGroups = allMenuGroups.filter(group => {
+    if (userRole === 'admin') return true;
+    if (userRole === 'editorial') {
+      return group.title === 'Editorial';
+    }
+    // Default: only Editorial for anyone else authenticated
+    return group.title === 'Editorial';
+  });
 
   const SidebarContent = () => (
     <>

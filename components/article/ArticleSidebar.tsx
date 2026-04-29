@@ -89,7 +89,7 @@ export function ArticleSidebar({ relatedArticles, trendingArticles, articleTitle
 
       {/* Social Share Column */}
       <ScrollReveal delay={400}>
-        <div className="bg-zinc-50 p-6 rounded-sm border border-zinc-200">
+        <div className="hidden lg:block bg-zinc-50 p-6 rounded-sm border border-zinc-200">
           <SocialShareSide title={articleTitle} url={articleUrl} slug={articleSlug} />
         </div>
       </ScrollReveal>

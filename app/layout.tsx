@@ -99,6 +99,7 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  manifest: '/manifest.json',
 }
 
 import { LanguageProvider } from '@/components/providers/LanguageProvider'

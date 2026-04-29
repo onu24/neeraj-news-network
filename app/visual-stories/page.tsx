@@ -45,6 +45,7 @@ export default async function VisualStoriesHub() {
                   src={story.coverImage}
                   alt={story.title}
                   fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 

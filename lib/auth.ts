@@ -14,7 +14,7 @@ export { COOKIE_NAME, SESSION_DURATION_SECONDS };
 
 export interface AdminPayload {
   email: string;
-  role: 'admin';
+  role: string;
 }
 
 /**
@@ -34,8 +34,8 @@ export async function signAdminJwt(payload: AdminPayload): Promise<string> {
 export async function verifyAdminJwt(token: string): Promise<AdminPayload | null> {
   try {
     const { payload } = await jwtVerify(token, secret, { algorithms: [ALGORITHM] });
-    if (payload.role === 'admin' && typeof payload.email === 'string') {
-      return { email: payload.email, role: 'admin' };
+    if (typeof payload.role === 'string' && typeof payload.email === 'string') {
+      return { email: payload.email, role: payload.role };
     }
     return null;
   } catch {

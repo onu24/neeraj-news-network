@@ -160,3 +160,27 @@ export interface User {
   photoURL?: string;
   isAdmin?: boolean;
 }
+
+export interface JobOpening {
+  id: string;
+  title: string;
+  slug: string;
+  location: string;
+  type: string;
+  description: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface JobApplication {
+  id: string;
+  jobId: string;
+  jobTitle: string;
+  applicantName: string;
+  applicantEmail: string;
+  applicantPhone: string;
+  coverLetter: string;
+  resumeUrl: string; // Cloudinary URL
+  createdAt: string;
+}

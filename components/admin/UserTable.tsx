@@ -103,11 +103,10 @@ export function UserTable({ initialUsers }: { initialUsers: UserData[] }) {
                   <button
                     onClick={() => handleRoleToggle(user._id, user.role)}
                     disabled={updatingId === user._id}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-all ${
-                      user.role === 'admin' 
-                        ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' 
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-all ${user.role === 'admin'
+                        ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
                         : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
-                    } disabled:opacity-50`}
+                      } disabled:opacity-50`}
                     title={user.role === 'admin' ? 'Change to User' : 'Promote to Admin'}
                   >
                     {updatingId === user._id ? (
@@ -128,7 +127,7 @@ export function UserTable({ initialUsers }: { initialUsers: UserData[] }) {
                 </td>
                 <td className="py-4 px-6 text-right whitespace-nowrap">
                   <div className="flex justify-end gap-2">
-                    <button 
+                    <button
                       onClick={() => handleDelete(user._id, user.name)}
                       disabled={deletingId === user._id}
                       className="p-2 text-red-600/70 hover:text-red-700 hover:bg-red-50 rounded-md transition-all disabled:cursor-not-allowed"
@@ -147,12 +146,12 @@ export function UserTable({ initialUsers }: { initialUsers: UserData[] }) {
           </tbody>
         </table>
       </div>
-      
+
       <div className="p-4 bg-secondary/10 border-t border-border flex items-start gap-3">
         <AlertCircle size={16} className="text-amber-500 flex-shrink-0 mt-0.5" />
         <p className="text-[11px] text-muted-foreground leading-relaxed">
-          <strong>Security Note:</strong> Deleting an admin user will immediately revoke their access. 
-          The first admin user should never be deleted to ensure system accessibility. 
+          <strong>Security Note:</strong> Deleting an admin user will immediately revoke their access.
+          The first admin user should never be deleted to ensure system accessibility.
           Use the role toggle to change permissions between standard User and system Admin.
         </p>
       </div>

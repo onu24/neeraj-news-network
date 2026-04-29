@@ -1,3 +1,6 @@
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { verifyAdminJwt, COOKIE_NAME } from '@/lib/auth';
 import Link from 'next/link';
 import { getUsers } from '@/lib/actions/user-actions';
 import { UserTable } from '@/components/admin/UserTable';
@@ -6,6 +9,14 @@ import { UserPlus, Users } from 'lucide-react';
 export const revalidate = 0;
 
 export default async function UsersManagementPage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_NAME)?.value;
+  const payload = token ? await verifyAdminJwt(token) : null;
+
+  if (!payload || payload.role !== 'admin') {
+    redirect('/admin');
+  }
+
   const result = await getUsers();
   const users = result.success ? result.users : [];
 
@@ -33,7 +44,7 @@ export default async function UsersManagementPage() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-background border border-border p-6 rounded-lg shadow-sm">
           <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Total Accounts</p>
           <h3 className="text-3xl font-bold text-primary">{users.length}</h3>
@@ -45,9 +56,15 @@ export default async function UsersManagementPage() {
           </h3>
         </div>
         <div className="bg-background border border-border p-6 rounded-lg shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Standard Users</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Editorial</p>
           <h3 className="text-3xl font-bold text-blue-600">
-            {users.filter((u: any) => u.role !== 'admin').length}
+            {users.filter((u: any) => u.role === 'editorial').length}
+          </h3>
+        </div>
+        <div className="bg-background border border-border p-6 rounded-lg shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Standard Users</p>
+          <h3 className="text-3xl font-bold text-zinc-600">
+            {users.filter((u: any) => u.role === 'user').length}
           </h3>
         </div>
       </div>
