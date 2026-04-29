@@ -4,6 +4,7 @@ import { Footer } from '@/components/layout/Footer';
 import { ArticleHeader } from '@/components/article/ArticleHeader';
 import { ArticleContent } from '@/components/article/ArticleContent';
 import { ArticleSidebar } from '@/components/article/ArticleSidebar';
+import { AdContainer } from '@/components/AdContainer';
 import { ShareButtons } from '@/components/article/ShareButtons';
 import { ArticleImageGallery } from '@/components/article/ArticleImageGallery';
 import { ReadingProgress } from '@/components/article/ReadingProgress';
@@ -155,6 +156,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             {/* Left Column (~70% / 8 grid cols) */}
             <div className="lg:col-span-8 flex flex-col">
               <ArticleHeader article={article} author={author || undefined} />
+              
+              <AdContainer slot="article_top_banner" className="bg-secondary/10" />
+
 
               <div className="mt-12">
                 <TableOfContents content={article.content_hi || article.content} />
@@ -190,7 +194,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             </div>
 
             {/* Right Sidebar (~30% / 4 grid cols) */}
-            <div className="lg:col-span-4 mt-12 lg:mt-0">
+            <div className="lg:col-span-4 mt-12 lg:mt-0 space-y-8">
+              <AdContainer slot="sidebar_top_square" format="rectangle" className="bg-secondary/10" />
               <ArticleSidebar
                 relatedArticles={filteredRelated}
                 trendingArticles={trendingArticles}

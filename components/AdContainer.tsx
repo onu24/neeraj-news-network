@@ -15,7 +15,7 @@ export function AdContainer({
   format = 'auto', 
   responsive = true, 
   className = '',
-  client = 'ca-pub-XXXXXXXXXXXXX' // Placeholder. Replace with actual Publisher ID
+  client = process.env.NEXT_PUBLIC_ADSENSE_ID || 'ca-pub-XXXXXXXXXXXXXXXX' 
 }: AdContainerProps) {
   const adRef = useRef<HTMLModElement>(null);
   

@@ -1,11 +1,11 @@
 'use server';
 
 import { getMongoDb } from '@/lib/mongodb';
-import { JobOpening } from '@/lib/types';
+import { JobOpening, JobApplication } from '@/lib/types';
 import { ObjectId } from 'mongodb';
 import { revalidatePath } from 'next/cache';
 
-export async function getJobOpenings(activeOnly = false) {
+export async function getJobOpenings(activeOnly = false): Promise<JobOpening[]> {
   try {
     const db = await getMongoDb();
     const query = activeOnly ? { isActive: true } : {};
@@ -17,17 +17,24 @@ export async function getJobOpenings(activeOnly = false) {
       .toArray();
 
     return jobs.map(job => ({
-      ...job,
-      _id: job._id.toString(),
       id: job._id.toString(),
-    }));
+      _id: job._id.toString(),
+      title: job.title || '',
+      slug: job.slug || '',
+      location: job.location || '',
+      type: job.type || '',
+      description: job.description || '',
+      isActive: job.isActive ?? true,
+      createdAt: job.createdAt || new Date().toISOString(),
+      updatedAt: job.updatedAt || new Date().toISOString(),
+    })) as JobOpening[];
   } catch (error) {
     console.error('Failed to fetch job openings:', error);
     return [];
   }
 }
 
-export async function getJobOpening(idOrSlug: string) {
+export async function getJobOpening(idOrSlug: string): Promise<JobOpening | null> {
   try {
     const db = await getMongoDb();
     
@@ -40,10 +47,17 @@ export async function getJobOpening(idOrSlug: string) {
     if (!job) return null;
 
     return {
-      ...job,
-      _id: job._id.toString(),
       id: job._id.toString(),
-    };
+      _id: job._id.toString(),
+      title: job.title || '',
+      slug: job.slug || '',
+      location: job.location || '',
+      type: job.type || '',
+      description: job.description || '',
+      isActive: job.isActive ?? true,
+      createdAt: job.createdAt || new Date().toISOString(),
+      updatedAt: job.updatedAt || new Date().toISOString(),
+    } as JobOpening;
   } catch (error) {
     console.error('Failed to fetch job:', error);
     return null;
@@ -114,19 +128,9 @@ export async function deleteJobOpening(id: string) {
   }
 }
 
-// Nodemailer config
-import nodemailer from 'nodemailer';
+// Mail utility
+import { sendMail } from '@/lib/mail';
 import cloudinary from '@/lib/cloudinary';
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
 
 export async function submitApplication(formData: FormData) {
   try {
@@ -203,7 +207,7 @@ Resume is attached and also available at: ${resumeUrl}
         ],
       };
 
-      await transporter.sendMail(mailOptions);
+      await sendMail(mailOptions);
     } else {
       console.warn('SMTP_USER not configured. Application saved but email not sent.');
     }
@@ -215,7 +219,7 @@ Resume is attached and also available at: ${resumeUrl}
   }
 }
 
-export async function getJobApplications(jobId?: string) {
+export async function getJobApplications(jobId?: string): Promise<JobApplication[]> {
   try {
     const db = await getMongoDb();
     const query = jobId ? { jobId } : {};
@@ -227,12 +231,20 @@ export async function getJobApplications(jobId?: string) {
       .toArray();
 
     return applications.map(app => ({
-      ...app,
-      _id: app._id.toString(),
       id: app._id.toString(),
-    }));
+      _id: app._id.toString(),
+      jobId: app.jobId || '',
+      jobTitle: app.jobTitle || '',
+      applicantName: app.applicantName || '',
+      applicantEmail: app.applicantEmail || '',
+      applicantPhone: app.applicantPhone || '',
+      coverLetter: app.coverLetter || '',
+      resumeUrl: app.resumeUrl || '',
+      createdAt: app.createdAt || new Date().toISOString(),
+    })) as JobApplication[];
   } catch (error) {
     console.error('Failed to fetch applications:', error);
     return [];
   }
 }
+

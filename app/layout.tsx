@@ -117,15 +117,14 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Google AdSense (Placeholder for Production) */}
-        {/*
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXX"
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
-        />
-        */}
+        {process.env.NEXT_PUBLIC_ADSENSE_ID && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_ID}`}
+            strategy="afterInteractive"
+            crossOrigin="anonymous"
+          />
+        )}
       </head>
       <body className="font-sans antialiased min-h-screen bg-background text-foreground tracking-tight" suppressHydrationWarning>
         <ThemeProvider
