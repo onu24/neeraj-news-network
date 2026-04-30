@@ -8,7 +8,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ─── City data ───────────────────────────────────────────────────────────────
-const CITIES = [
+export const CITIES = [
   // Chhattisgarh
   { name: 'Bilaspur',   state: 'CG', lat: 22.0797, lon: 82.1391 },
   { name: 'Raipur',     state: 'CG', lat: 21.2514, lon: 81.6296 },
@@ -28,10 +28,10 @@ const CITIES = [
   { name: 'Bhopal',     state: 'MP', lat: 23.2599, lon: 77.4126 },
 ];
 
-type CityEntry = (typeof CITIES)[number];
+export type CityEntry = (typeof CITIES)[number];
 
 // ─── Component ───────────────────────────────────────────────────────────────
-export function WeatherWidget() {
+export function WeatherWidget({ onCityChange }: { onCityChange?: (city: CityEntry) => void }) {
   const [selectedCity, setSelectedCity] = useState<CityEntry>(CITIES[0]);
   const [data, setData]                 = useState<any>(null);
   const [loading, setLoading]           = useState(true);
@@ -53,6 +53,7 @@ export function WeatherWidget() {
   useEffect(() => {
     setLoading(true);
     setData(null);
+    if (onCityChange) onCityChange(selectedCity);
     async function fetchWeather() {
       try {
         const { lat, lon, name, state } = selectedCity;

@@ -5,9 +5,10 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { NewsArticle } from '@/lib/types';
 import { useLanguage } from '@/components/providers/LanguageProvider';
-import { WeatherWidget } from '../layout/WeatherWidget';
+import { WeatherWidget, CITIES, CityEntry } from '../layout/WeatherWidget';
 import { motion } from 'framer-motion';
 import { AnimatedLive } from '../layout/AnimatedIcons';
+import { useState } from 'react';
 
 export interface HeroLatestSectionProps {
   leadArticle: NewsArticle;
@@ -16,6 +17,7 @@ export interface HeroLatestSectionProps {
 
 export function HeroLatestSection({ leadArticle, latestArticles }: HeroLatestSectionProps) {
   const { language, t } = useLanguage();
+  const [currentCity, setCurrentCity] = useState<CityEntry>(CITIES[0]);
 
   const formatDate = (dateStr: string) => {
      try {
@@ -107,14 +109,16 @@ export function HeroLatestSection({ leadArticle, latestArticles }: HeroLatestSec
                  <div className="flex items-center justify-between mb-5 sm:mb-8">
                     <div className="flex items-center gap-2 sm:gap-3">
                        <span className="w-1 h-4 bg-primary rounded-full flex-shrink-0" />
-                       <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.25em] sm:tracking-[0.3em] text-foreground">Bilaspur Profile</span>
+                       <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.25em] sm:tracking-[0.3em] text-foreground">
+                         {currentCity.name} Profile
+                       </span>
                     </div>
                     <div className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-40"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                     </div>
                  </div>
-                 <WeatherWidget />
+                 <WeatherWidget onCityChange={setCurrentCity} />
               </div>
 
               <div className="flex items-center justify-between mb-10 pb-4 border-b border-zinc-200 dark:border-zinc-800">
